@@ -4,6 +4,7 @@
  */
 package proyecto_insta;
 
+
 /**
  *
  * @author croge
@@ -14,7 +15,6 @@ public class Proyecto_Insta {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
     }
     
 }

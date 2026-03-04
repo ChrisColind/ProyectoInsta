@@ -4,11 +4,15 @@
  */
 package proyecto_insta;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
@@ -17,6 +21,7 @@ import javax.swing.JTextField;
  * @author croge
  */
 public class Gui_Desktop {
+    
     public static void main(String []args){
         JFrame Ventana = new JFrame("Instagram desktop");
         
@@ -25,15 +30,28 @@ public class Gui_Desktop {
         Ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         Ventana.setLayout(null);
         
+          JPanel panelFondo = new JPanel(null) {   // null layout igual que antes
+            private Image img = new ImageIcon("Fondos/FondoPrincipal.jpg").getImage();
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (img != null) {
+                    g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
+        
+        
         //x, y, ancho, alto
         JLabel lblTitulo = new JLabel("Iniciar sesion en instagram:"); 
         lblTitulo.setBounds(1000, 50, 200, 30);  //mover
-        Ventana.add(lblTitulo);
+        panelFondo.add(lblTitulo);
         
         
         JTextField txtUsuario = new JTextField("  Usuario");
         txtUsuario.setBounds(1000, 50+40, 250, 60); //mover 1= +100, 3= +50
-        Ventana.add(txtUsuario);
+        panelFondo.add(txtUsuario);
         
         txtUsuario.addFocusListener(new FocusAdapter() { 
             @Override
@@ -52,12 +70,12 @@ public class Gui_Desktop {
         
         JTextField txtContra = new JTextField("   Contrase;a");
         txtContra.setBounds(1000, 50+110, 250, 60); //mover 1= +100, 3= +50
-        Ventana.add(txtContra);
+        panelFondo.add(txtContra);
         
         JButton btnLogin = new JButton("Iniciar sesion"); 
         btnLogin.setBounds(1000, 300, 200, 40); 
-        Ventana.add(btnLogin);
-        
+        panelFondo.add(btnLogin);
+        Ventana.setContentPane(panelFondo);
         Ventana.setVisible(true);
     }
 }
