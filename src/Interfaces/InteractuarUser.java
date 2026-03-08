@@ -11,7 +11,7 @@ import Enums.Enums;
  * @author croge
  */
 //interacciones del user
-interface InteractuarUser {
+public interface InteractuarUser {
     void Seguir(String username) throws Exception;
     void NoSeguir(String username) throws Exception;
     void EnviarMensaje(String receptor, String contenido, Enums.TipoMensaje tipo) throws Exception;
