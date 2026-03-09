@@ -2,11 +2,14 @@ package proyecto_insta;
 
 import Absrtact.ABSinstru;
 import Interfaces.InteractuarUser;
-import PEnums.Enums.*; // Importación masiva de los Enums internos
+import PEnums.Enums.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-
+/**
+ *
+ * @author Rogelio
+ */
 public class User extends ABSinstru implements InteractuarUser {
 
     private static final long serialVersionUID = 1L;
@@ -30,24 +33,42 @@ public class User extends ABSinstru implements InteractuarUser {
         super(RAIZ + username + "/insta.ins");
 
         this.nombreCompleto = nombreCompleto;
-        this.genero         = genero;
-        this.username       = username;
-        this.password       = password;
-        this.edad           = edad;
-        this.fotoPerfil     = fotoPerfil;
-        this.tipoCuenta     = tipoCuenta;
+        this.genero = genero;
+        this.username = username;
+        this.password = password;
+        this.edad = edad;
+        this.fotoPerfil = fotoPerfil;
+        this.tipoCuenta = tipoCuenta;
 
         this.fechaRegistro  = LocalDate.now().toString();
         this.estado         = EstadoCuenta.ACTIVO;
     }
 
     protected boolean validar() {
-        if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) return false;
-        if (username       == null || username.trim().isEmpty())       return false;
-        if (password       == null || password.trim().isEmpty())       return false;
-        if (edad <= 0)                                                 return false;
-        if (genero     == null)                                        return false;
-        if (tipoCuenta == null)                                        return false;
+        if (nombreCompleto == null || nombreCompleto.trim().isEmpty()){ 
+            return false;
+        }
+        
+        if (username == null || username.trim().isEmpty()){
+            return false;
+        }
+        
+        if (password == null || password.trim().isEmpty()){
+            return false;
+        }
+        
+        if (edad <= 0){
+            return false;
+        }
+        
+        if (genero == null){
+            return false;
+        }
+        
+        if (tipoCuenta == null){
+            return false;
+        }
+        
         return true;
     }
 

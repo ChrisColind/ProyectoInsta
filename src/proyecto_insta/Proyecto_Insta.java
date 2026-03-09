@@ -15,7 +15,7 @@ public class Proyecto_Insta {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Gui abrir = new Gui();  
+        Gui_Inicio abrir = new Gui_Inicio();  
         abrir.ventana.setVisible(true);
     }
     
