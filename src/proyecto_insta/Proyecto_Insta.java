@@ -16,7 +16,7 @@ public class Proyecto_Insta {
      */
     public static void main(String[] args) {
         Gui abrir = new Gui();  
-        abrir.VentanaP.setVisible(true);
+        abrir.ventana.setVisible(true);
     }
     
 }

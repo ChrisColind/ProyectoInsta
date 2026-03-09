@@ -4,7 +4,7 @@
  */
 package Interfaces;
 
-import Enums.Enums;
+import PEnums.Enums;
 
 /**
  *
@@ -12,6 +12,7 @@ import Enums.Enums;
  */
 //interacciones del user
 public interface InteractuarUser {
+    
     void Seguir(String username) throws Exception;
     void NoSeguir(String username) throws Exception;
     void EnviarMensaje(String receptor, String contenido, Enums.TipoMensaje tipo) throws Exception;
