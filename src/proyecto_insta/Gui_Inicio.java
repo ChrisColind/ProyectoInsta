@@ -81,8 +81,11 @@ public class Gui_Inicio {
         pnlCards.setBounds(0, 0, W, H);
 
         pnlCards.add(construirPantallaLogin(),    "login");
-        Gui_Registro guiReg = new Gui_Registro(ventana, cardLayout, pnlCards);
-        pnlCards.add(guiReg.construirPantalla(), "registro");
+        Gui_Home   guiHome   = new Gui_Home(ventana, cardLayout, pnlCards, usuarioActual);
+        Gui_Buscar guiBuscar = new Gui_Buscar(ventana, cardLayout, pnlCards, usuarioActual);
+        pnlCards.add(guiBuscar.construirPantalla(), "buscar");
+        Gui_Registro guiReg  = new Gui_Registro(ventana, cardLayout, pnlCards);
+        pnlCards.add(guiReg.construirPantalla(), "registro");   
 
         panelRaiz.add(pnlCards);
 
@@ -392,8 +395,10 @@ public class Gui_Inicio {
             txtContra.setText("Contraseña"); txtContra.setForeground(C_GRIS);
             
             txtContra.setEchoChar((char) 0); passVisible[0] = false;
-            Gui_Home guiHome = new Gui_Home(ventana, cardLayout, pnlCards, usuario);
+            Gui_Home   guiHome   = new Gui_Home(ventana, cardLayout, pnlCards, usuarioActual);
+            Gui_Buscar guiBuscar = new Gui_Buscar(ventana, cardLayout, pnlCards, usuarioActual);
             pnlCards.add(guiHome.construirPantalla(),"home");
+            pnlCards.add(guiBuscar.construirPantalla(), "buscar");
             ir("home");
             
         } else {
