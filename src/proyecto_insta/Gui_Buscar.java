@@ -6,6 +6,8 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import Logica.*;
+import Absrtact.*;
 
 public class Gui_Buscar {
 
@@ -154,6 +156,7 @@ public class Gui_Buscar {
             btnNav.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if (idx == 0) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "home"));
             if (idx == 2) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "crear"));
+            if (idx == 3) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "chats"));
             side.add(btnNav);
         }
 

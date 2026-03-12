@@ -2,6 +2,8 @@ package proyecto_insta;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import Logica.*;
+import Absrtact.*;
 import javax.swing.*;
 
 public class Gui_Home {
@@ -138,6 +140,7 @@ public class Gui_Home {
             btnNav.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if (idx == 1) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "buscar"));
             if (idx == 2) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "crear"));
+            if (idx == 3) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "chats"));
             side.add(btnNav);
         }
         JLabel lblFooter = new JLabel("© 2025 Instagram from Meta");

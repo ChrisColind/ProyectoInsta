@@ -398,10 +398,12 @@ public class Gui_Inicio {
             Gui_Home   guiHome   = new Gui_Home(ventana, cardLayout, pnlCards, usuarioActual);
             Gui_Buscar guiBuscar = new Gui_Buscar(ventana, cardLayout, pnlCards, usuarioActual);
             Gui_Crear guiCrear = new Gui_Crear(ventana, cardLayout, pnlCards, usuarioActual);
+            Gui_Chats guiChats = new Gui_Chats(ventana, cardLayout, pnlCards, usuarioActual);
             
             pnlCards.add(guiCrear.construirPantalla(), "crear");
             pnlCards.add(guiHome.construirPantalla(),"home");
             pnlCards.add(guiBuscar.construirPantalla(), "buscar");
+            pnlCards.add(guiChats.construirPantalla(), "chats");
             ir("home");
             
         } else {
@@ -411,8 +413,6 @@ public class Gui_Inicio {
             btnOjo.repaint();
         }
     }
-    
-    //FIN DE INICIO===============================================================
     
     
 }

@@ -1,13 +1,10 @@
 package proyecto_insta;
 
 import java.awt.*;
+import Logica.*;
+import Absrtact.*;
 import java.awt.event.*;
-import java.awt.geom.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import javax.swing.*;
-import javax.swing.border.*;
 
 public class Gui_Crear {
 
@@ -192,6 +189,9 @@ public class Gui_Crear {
             }
             if (idx == 1) {
                 btnNav.addActionListener(e -> cardLayout.show(pnlCards, "buscar"));
+            }
+            if (idx == 3){
+                btnNav.addActionListener(e -> cardLayout.show(pnlCards, "chats"));
             }
             side.add(btnNav);
         }
