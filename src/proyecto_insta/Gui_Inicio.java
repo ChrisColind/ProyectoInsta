@@ -311,7 +311,7 @@ public class Gui_Inicio {
         txtContra .addActionListener(e -> accionLogin());
 
         // Label error debajo de campos
-        JLabel lblOlvide = new JLabel("¿Olvidaste tu contraseña?", SwingConstants.CENTER);
+        JLabel lblOlvide = new JLabel("", SwingConstants.CENTER);
         lblOlvide.setFont(new Font("SansSerif", Font.BOLD, 12));
         lblOlvide.setForeground(C_AZUL);
         lblOlvide.setBounds(20, 284, 310, 20);
@@ -397,6 +397,9 @@ public class Gui_Inicio {
             txtContra.setEchoChar((char) 0); passVisible[0] = false;
             Gui_Home   guiHome   = new Gui_Home(ventana, cardLayout, pnlCards, usuarioActual);
             Gui_Buscar guiBuscar = new Gui_Buscar(ventana, cardLayout, pnlCards, usuarioActual);
+            Gui_Crear guiCrear = new Gui_Crear(ventana, cardLayout, pnlCards, usuarioActual);
+            
+            pnlCards.add(guiCrear.construirPantalla(), "crear");
             pnlCards.add(guiHome.construirPantalla(),"home");
             pnlCards.add(guiBuscar.construirPantalla(), "buscar");
             ir("home");

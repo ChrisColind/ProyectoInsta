@@ -12,9 +12,7 @@ import java.io.Serializable;
 
 //instrucciones para las otras clases: 
 public abstract class ABSinstru implements Serializable, GestionUser {
-        private static final long serialVersionUID = 1L;
         protected String rutaArchivo;
-        
         
     public ABSinstru(String rutaArchivo) {
         this.rutaArchivo = rutaArchivo;

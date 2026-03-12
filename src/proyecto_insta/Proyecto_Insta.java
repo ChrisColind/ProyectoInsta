@@ -12,7 +12,7 @@ package proyecto_insta;
 public class Proyecto_Insta {
 
     /**
-     * @param args the command line arguments
+     * @param args t    he command line arguments
      */
     public static void main(String[] args) {
         Gui_Inicio abrir = new Gui_Inicio();  

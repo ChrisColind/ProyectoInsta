@@ -15,6 +15,5 @@ public class Enums {
     public enum EstadoCuenta{ACTIVO, INACTIVO}
     public enum TipoMensaje{TEXTO, STICKER}
     public enum EstadoMensaje{VISTO, NOVISTO}
-    public enum TipoImagen{CUADRADA, VERTICAL, HORIZONTAL}
 
 }
