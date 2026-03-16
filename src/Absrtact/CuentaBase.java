@@ -6,8 +6,7 @@
 package Absrtact;
 
 
-import Logica.SistemaArchivos;
-import java.io.*;
+import Logica.GestorArchivos;
 import java.util.*;
 
 /**
@@ -42,19 +41,19 @@ public abstract class CuentaBase {
     public abstract String toResumen();
  
     protected List<String> leerLineas(String ruta) {
-        return SistemaArchivos.leerLineas(ruta);
+        return GestorArchivos.leerLineas(ruta);
     }
  
     protected void agregarSiNoExiste(String ruta, String valor) {
         List<String> lista = leerLineas(ruta);
         if (!lista.contains(valor.toLowerCase())) {
-            SistemaArchivos.escribirLinea(ruta, valor.toLowerCase());
+            GestorArchivos.escribirLinea(ruta, valor.toLowerCase());
         }
     }
  
     protected void eliminarLinea(String ruta, String valor) {
         List<String> lista = leerLineas(ruta);
         lista.remove(valor.toLowerCase());
-        SistemaArchivos.sobreescribir(ruta, lista);
+        GestorArchivos.sobreescribir(ruta, lista);
     }
 }

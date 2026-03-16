@@ -10,10 +10,28 @@ package PEnums;
  */
 
 public class Enums {
-    public enum Genero{M, F}
-    public enum TipoCuenta{PUBLICA, PRIVADA}
-    public enum EstadoCuenta{ACTIVO, INACTIVO}
-    public enum TipoMensaje{TEXTO, STICKER}
-    public enum EstadoMensaje{VISTO, NOVISTO}
 
+    public enum Genero {
+        M, F
+    }
+
+    public enum TipoCuenta {
+        PUBLICA, PRIVADA
+    }
+
+    public enum EstadoCuenta {
+        ACTIVO, INACTIVO
+    }
+
+    public enum TipoMensaje {
+        TEXTO, STICKER
+    }
+
+    public enum TipoMultimedia {
+        IMAGEN, VIDEO, NINGUNO
+    }
+
+    public enum ModoVisual {
+        MODO_DESKTOP, MODO_MOBILE
+    }
 }

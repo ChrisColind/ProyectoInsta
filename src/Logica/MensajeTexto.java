@@ -5,6 +5,7 @@
  */
 package Logica;
 import Absrtact.Mensaje;
+import PEnums.Enums.TipoMensaje;
 /**
  *
  * @author Rogelio
@@ -20,13 +21,27 @@ public class MensajeTexto extends Mensaje {
  
     public MensajeTexto() {}
  
-    @Override public String getTipo()       { return "texto"; }
-    @Override public String getContenido()  { return texto; }
-    @Override protected void setContenidoInterno(String v) { this.texto = v; }
+    public String mostrarMensaje() {
+        return "[" + hora + "] " + de + ": " + texto;
+    }
+ 
+    @Override
+    public String getTipo() {
+        return TipoMensaje.TEXTO.name().toLowerCase();
+    }
+ 
+    @Override
+    public String getContenido() {
+        return texto;
+    }
+ 
+    @Override
+    protected void setContenidoInterno(String v) {
+        this.texto = v;
+    }
  
     @Override
     public String serializar() {
-        return de + "|" + para + "|texto|" + texto + "|" + fecha + "|" + hora + "|" + leido;
+        return de + "|" + para + "|" + getTipo() + "|" + texto + "|" + fecha + "|" + hora + "|" + leido;
     }
 }
- 

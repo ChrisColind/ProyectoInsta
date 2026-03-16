@@ -11,7 +11,7 @@ import java.util.*;
  *
  * @author Rogelio
  */
-public class SistemaArchivos {
+public class GestorArchivos {
  
     public static final String RAIZ              = "INSTA_RAIZ/";
     public static final String STICKERS_GLOBALES = RAIZ + "stickers_globales/";
@@ -44,7 +44,7 @@ public class SistemaArchivos {
         crearArchivo(base + "stickers.ins");
     }
  
-    public static boolean registrarUsuario(String username) {
+    public static boolean registrarUsername(String username) {
         String ruta = RAIZ + "users.ins";
         List<String> lista = leerLineas(ruta);
         if (lista.contains(username.toLowerCase())) return false;
@@ -60,10 +60,60 @@ public class SistemaArchivos {
         return leerLineas(RAIZ + "users.ins");
     }
  
-    public static List<String> buscarPorCoincidencia(String texto) {
-        List<String> resultado = new ArrayList<>();
-        for (String u : getTodosLosUsuarios())
-            if (u.contains(texto.toLowerCase())) resultado.add(u);
+    // guarda un usuario usando RandomAccessFile (binario)
+    public static void guardarUsuarioBinario(String username, String datos) {
+        String ruta = RAIZ + username.toLowerCase() + "/insta.ins";
+        try (RandomAccessFile raf = new RandomAccessFile(ruta, "rw")) {
+            raf.setLength(0);
+            raf.writeUTF(datos);
+        } catch (IOException e) {
+            System.out.println("Error guardando usuario: " + e.getMessage());
+        }
+    }
+ 
+    public static String leerUsuarioBinario(String username) {
+        String ruta = RAIZ + username.toLowerCase() + "/insta.ins";
+        File f = new File(ruta);
+        if (!f.exists()) return null;
+        try (RandomAccessFile raf = new RandomAccessFile(ruta, "r")) {
+            return raf.readUTF();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+ 
+    // guarda una publicacion usando RandomAccessFile
+    public static void guardarPublicacionBinaria(String username, String id, String datos) {
+        String carpeta = RAIZ + username.toLowerCase() + "/publicaciones/";
+        new File(carpeta).mkdirs();
+        try (RandomAccessFile raf = new RandomAccessFile(carpeta + id + ".pub", "rw")) {
+            raf.setLength(0);
+            raf.writeUTF(datos);
+        } catch (IOException e) {
+            System.out.println("Error guardando publicacion: " + e.getMessage());
+        }
+    }
+ 
+    public static String leerPublicacionBinaria(String ruta) {
+        File f = new File(ruta);
+        if (!f.exists()) return null;
+        try (RandomAccessFile raf = new RandomAccessFile(ruta, "r")) {
+            return raf.readUTF();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+ 
+    // recorre recursivamente carpetas buscando archivos con cierta extension
+    public static List<File> buscarArchivosRecursivo(File carpeta, String extension) {
+        List<File> resultado = new ArrayList<>();
+        if (carpeta == null || !carpeta.exists()) return resultado;
+        File[] hijos = carpeta.listFiles();
+        if (hijos == null) return resultado;
+        for (File f : hijos) {
+            if (f.isDirectory()) resultado.addAll(buscarArchivosRecursivo(f, extension));
+            else if (f.getName().endsWith(extension)) resultado.add(f);
+        }
         return resultado;
     }
  
@@ -83,19 +133,6 @@ public class SistemaArchivos {
         if (!leerLineas(ruta).contains(nombre)) escribirLinea(ruta, nombre);
     }
  
-    // lee recursivamente todos los archivos con cierta extension dentro de una carpeta
-    public static List<File> leerArchivosRecursivo(File carpeta, String extension) {
-        List<File> resultado = new ArrayList<>();
-        if (carpeta == null || !carpeta.exists()) return resultado;
-        File[] hijos = carpeta.listFiles();
-        if (hijos == null) return resultado;
-        for (File f : hijos) {
-            if (f.isDirectory()) resultado.addAll(leerArchivosRecursivo(f, extension));
-            else if (f.getName().endsWith(extension)) resultado.add(f);
-        }
-        return resultado;
-    }
- 
     public static List<String> leerLineas(String ruta) {
         List<String> lista = new ArrayList<>();
         File f = new File(ruta);
@@ -110,7 +147,8 @@ public class SistemaArchivos {
  
     public static void escribirLinea(String ruta, String contenido) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ruta, true))) {
-            bw.write(contenido); bw.newLine();
+            bw.write(contenido);
+            bw.newLine();
         } catch (IOException e) { }
     }
  
@@ -121,7 +159,8 @@ public class SistemaArchivos {
     }
  
     private static void crearCarpeta(String ruta) {
-        File f = new File(ruta); if (!f.exists()) f.mkdirs();
+        File f = new File(ruta);
+        if (!f.exists()) f.mkdirs();
     }
  
     private static void crearArchivo(String ruta) {

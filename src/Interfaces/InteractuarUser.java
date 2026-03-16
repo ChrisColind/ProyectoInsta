@@ -4,19 +4,16 @@
  */
 package Interfaces;
 
-import PEnums.Enums;
-
 /**
  *
  * @author croge
  */
 //interacciones del user
 public interface InteractuarUser {
-    
-    void Seguir(String username) throws Exception;
-    void NoSeguir(String username) throws Exception;
-    void EnviarMensaje(String receptor, String contenido, Enums.TipoMensaje tipo) throws Exception;
-    public boolean SigueA(String username) throws Exception;
-    //revisar si x persona sigue a n persona
+
+    void comentar(String username, String texto);
+    void mencionar(String username);
+    void reaccionar(String username);
+
     
 }

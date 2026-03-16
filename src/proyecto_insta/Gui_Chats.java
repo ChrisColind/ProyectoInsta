@@ -4,18 +4,21 @@
  * and open the template in the editor.
  */
 package proyecto_insta;
+
 import Logica.*;
 import Absrtact.Mensaje;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 import java.util.List;
 import javax.swing.*;
- 
+
 /**
  *
  * @author Rogelio
  */
 public class Gui_Chats {
+
     private static final Color C_BORDE   = new Color(219, 219, 219);
     private static final Color C_FONDO   = new Color(250, 250, 250);
     private static final Color C_TEXTO   = new Color(38,  38,  38);
@@ -25,31 +28,29 @@ public class Gui_Chats {
     private static final Color C_HOVER   = new Color(245, 245, 245);
     private static final Color C_BURBUJA_MIO  = new Color(0, 149, 246);
     private static final Color C_BURBUJA_OTRO = new Color(239, 239, 239);
- 
+
     private static final int W         = 1366;
     private static final int H         = 768;
     private static final int TOPBAR_H  = 54;
     private static final int SIDEBAR_W = 244;
     private static final int LISTA_W   = 300;
- 
-    private final JFrame     ventana;
-    private final CardLayout cardLayout;
-    private final JPanel     pnlCards;
-    private final String     usuarioActual;
- 
+
+    private final JFrame ventana;
+    private final Gui_Navegador nav;
+    private final String usuarioActual;
+
     private JPanel      pnlMensajes;
     private JTextField  txtMensaje;
     private JLabel      lblChatActivo;
     private JPanel      pnlListaConvs;
     private String      chatAbierto = null;
- 
-    public Gui_Chats(JFrame ventana, CardLayout cardLayout, JPanel pnlCards, String usuarioActual) {
+
+    public Gui_Chats(JFrame ventana, Gui_Navegador nav, String usuarioActual) {
         this.ventana       = ventana;
-        this.cardLayout    = cardLayout;
-        this.pnlCards      = pnlCards;
+        this.nav           = nav;
         this.usuarioActual = usuarioActual;
     }
- 
+
     public JPanel construirPantalla() {
         JPanel panel = new JPanel(null);
         panel.setBackground(C_FONDO);
@@ -59,7 +60,7 @@ public class Gui_Chats {
         panel.add(construirAreaChat());
         return panel;
     }
- 
+
     private JPanel construirTopBar() {
         JPanel bar = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
@@ -70,7 +71,7 @@ public class Gui_Chats {
         };
         bar.setBackground(C_BLANCO);
         bar.setBounds(0, 0, W, TOPBAR_H);
- 
+
         JLabel lblLogo = new JLabel("Instagram") {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -89,7 +90,7 @@ public class Gui_Chats {
         bar.add(lblLogo);
         return bar;
     }
- 
+
     private JPanel construirSidebar() {
         JPanel side = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
@@ -100,36 +101,63 @@ public class Gui_Chats {
         };
         side.setBackground(C_BLANCO);
         side.setBounds(0, TOPBAR_H, SIDEBAR_W, H - TOPBAR_H);
- 
-        JPanel avatar = crearAvatar(56, new Color(180, 160, 220));
+
+        Usuario _uSide = Usuario.cargarDesdeArchivo(usuarioActual);
+        String _rutaSide = _uSide != null ? _uSide.getRutaFoto() : null;
+        JPanel avatar = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (_rutaSide != null && !_rutaSide.isEmpty()) {
+                    try {
+                        Image img = new ImageIcon(_rutaSide).getImage().getScaledInstance(56, 56, Image.SCALE_SMOOTH);
+                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
+                        g2.drawImage(img, 0, 0, this);
+                    } catch (Exception ex) {
+                        g2.setColor(colorDeUsuario(usuarioActual));
+                        g2.fillOval(0, 0, 56, 56);
+                    }
+                } else {
+                    g2.setColor(colorDeUsuario(usuarioActual));
+                    g2.fillOval(0, 0, 56, 56);
+                }
+                g2.dispose();
+            }
+        };
+        avatar.setOpaque(false);
         avatar.setBounds(16, 20, 56, 56);
         side.add(avatar);
- 
+
         JLabel lblNombre = new JLabel(usuarioActual);
         lblNombre.setFont(new Font("SansSerif", Font.BOLD, 14));
         lblNombre.setForeground(C_TEXTO);
         lblNombre.setBounds(84, 26, 144, 18);
         side.add(lblNombre);
- 
-        JLabel lblVer = new JLabel("Ver perfil");
-        lblVer.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        lblVer.setForeground(C_AZUL);
-        lblVer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        lblVer.setBounds(84, 44, 80, 16);
-        side.add(lblVer);
- 
+
+        JLabel lblVerPerfil = new JLabel("Ver perfil");
+        lblVerPerfil.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblVerPerfil.setForeground(new Color(0, 149, 246));
+        lblVerPerfil.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        lblVerPerfil.setBounds(84, 44, 80, 16);
+        lblVerPerfil.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) { nav.ir("perfil"); }
+        });
+        side.add(lblVerPerfil);
+
         JSeparator sep = new JSeparator();
         sep.setForeground(C_BORDE);
         sep.setBounds(16, 90, SIDEBAR_W - 32, 1);
         side.add(sep);
- 
+
         String[] nombres = { "Inicio", "Buscar", "Crear", "Chats", "Perfil" };
         int[]    posY    = { 110, 162, 214, 266, 318 };
- 
+
         for (int i = 0; i < nombres.length; i++) {
             final int idx    = i;
             final boolean activo = (idx == 3);
- 
+
             JButton btn = new JButton() {
                 @Override protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D) g.create();
@@ -160,12 +188,13 @@ public class Gui_Chats {
             btn.setOpaque(false); btn.setContentAreaFilled(false);
             btn.setBorderPainted(false); btn.setFocusPainted(false);
             btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            if (idx == 0) btn.addActionListener(e -> cardLayout.show(pnlCards, "home"));
-            if (idx == 1) btn.addActionListener(e -> cardLayout.show(pnlCards, "buscar"));
-            if (idx == 2) btn.addActionListener(e -> cardLayout.show(pnlCards, "crear"));
+            if (idx == 0) btn.addActionListener(e -> nav.ir("home"));
+            if (idx == 1) btn.addActionListener(e -> nav.ir("buscar"));
+            if (idx == 2) btn.addActionListener(e -> nav.ir("crear"));
+            if (idx == 4) btn.addActionListener(e -> nav.ir("perfil"));
             side.add(btn);
         }
- 
+
         JLabel lblFooter = new JLabel("© 2025 Instagram from Meta");
         lblFooter.setFont(new Font("SansSerif", Font.PLAIN, 10));
         lblFooter.setForeground(C_GRIS);
@@ -173,26 +202,44 @@ public class Gui_Chats {
         side.add(lblFooter);
         return side;
     }
- 
+
     private JScrollPane construirListaConversaciones() {
         pnlListaConvs = new JPanel();
         pnlListaConvs.setLayout(new BoxLayout(pnlListaConvs, BoxLayout.Y_AXIS));
         pnlListaConvs.setBackground(C_BLANCO);
- 
+
+        JPanel headerLista = new JPanel(null);
+        headerLista.setBackground(C_BLANCO);
+        headerLista.setMaximumSize(new Dimension(LISTA_W, 44));
+        headerLista.setPreferredSize(new Dimension(LISTA_W, 44));
+
         JLabel lblTitulo = new JLabel("  Mensajes");
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 15));
         lblTitulo.setForeground(C_TEXTO);
-        lblTitulo.setMaximumSize(new Dimension(LISTA_W, 40));
-        lblTitulo.setPreferredSize(new Dimension(LISTA_W, 40));
-        pnlListaConvs.add(lblTitulo);
- 
+        lblTitulo.setBounds(0, 10, 180, 24);
+        headerLista.add(lblTitulo);
+
+        JLabel btnNuevo = new JLabel("+ Nuevo");
+        btnNuevo.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btnNuevo.setForeground(C_AZUL);
+        btnNuevo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnNuevo.setBounds(LISTA_W - 70, 14, 65, 16);
+        btnNuevo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mostrarDialogoNuevoChat();
+            }
+        });
+        headerLista.add(btnNuevo);
+        pnlListaConvs.add(headerLista);
+
         JSeparator sep = new JSeparator();
         sep.setMaximumSize(new Dimension(LISTA_W, 1));
         sep.setForeground(C_BORDE);
         pnlListaConvs.add(sep);
- 
+
         cargarListaConversaciones();
- 
+
         JScrollPane scroll = new JScrollPane(pnlListaConvs);
         scroll.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, C_BORDE));
         scroll.getVerticalScrollBar().setUnitIncrement(12);
@@ -200,13 +247,13 @@ public class Gui_Chats {
         scroll.setBounds(SIDEBAR_W, TOPBAR_H, LISTA_W, H - TOPBAR_H);
         return scroll;
     }
- 
+
     private void cargarListaConversaciones() {
         // quitar items anteriores menos titulo y separador
         while (pnlListaConvs.getComponentCount() > 2) pnlListaConvs.remove(2);
- 
+
         List<String> convs = Conversacion.getConversaciones(usuarioActual);
- 
+
         if (convs.isEmpty()) {
             JLabel lblVacio = new JLabel("  Sin conversaciones");
             lblVacio.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -215,11 +262,11 @@ public class Gui_Chats {
             lblVacio.setMaximumSize(new Dimension(LISTA_W, 40));
             pnlListaConvs.add(lblVacio);
         }
- 
+
         for (String otro : convs) {
             Conversacion conv = new Conversacion(usuarioActual, otro);
             int noLeidos = conv.getMensajesNoLeidos();
- 
+
             JPanel fila = new JPanel(null) {
                 @Override protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D) g.create();
@@ -234,17 +281,17 @@ public class Gui_Chats {
             fila.setPreferredSize(new Dimension(LISTA_W, 60));
             fila.setMaximumSize(new Dimension(LISTA_W, 60));
             fila.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
- 
+
             JPanel av = crearAvatar(38, colorDeUsuario(otro));
             av.setBounds(10, 11, 38, 38);
             fila.add(av);
- 
+
             JLabel lblNombre = new JLabel("@" + otro);
             lblNombre.setFont(new Font("SansSerif", Font.BOLD, 13));
             lblNombre.setForeground(C_TEXTO);
             lblNombre.setBounds(58, 12, 180, 18);
             fila.add(lblNombre);
- 
+
             if (noLeidos > 0) {
                 JLabel badge = new JLabel(String.valueOf(noLeidos), SwingConstants.CENTER) {
                     @Override protected void paintComponent(Graphics g) {
@@ -262,13 +309,13 @@ public class Gui_Chats {
                 badge.setBounds(262, 20, 22, 22);
                 fila.add(badge);
             }
- 
+
             fila.addMouseListener(new MouseAdapter() {
                 @Override public void mouseEntered(MouseEvent e) { fila.setBackground(C_HOVER); }
                 @Override public void mouseExited(MouseEvent e)  { fila.setBackground(C_BLANCO); }
                 @Override public void mouseClicked(MouseEvent e) { abrirChat(otro); }
             });
- 
+
             // boton eliminar conversacion
             JButton btnX = new JButton("✕") {
                 @Override protected void paintComponent(Graphics g) {
@@ -298,18 +345,18 @@ public class Gui_Chats {
             fila.add(btnX);
             pnlListaConvs.add(fila);
         }
- 
+
         pnlListaConvs.revalidate();
         pnlListaConvs.repaint();
     }
- 
+
     private JPanel construirAreaChat() {
         JPanel area = new JPanel(null);
         area.setBackground(C_FONDO);
         int x = SIDEBAR_W + LISTA_W;
         int w = W - x;
         area.setBounds(x, TOPBAR_H, w, H - TOPBAR_H);
- 
+
         // cabecera del chat
         JPanel header = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
@@ -320,28 +367,29 @@ public class Gui_Chats {
         };
         header.setBackground(C_BLANCO);
         header.setBounds(0, 0, w, 54);
- 
+
         lblChatActivo = new JLabel("Selecciona una conversacion");
         lblChatActivo.setFont(new Font("SansSerif", Font.BOLD, 14));
         lblChatActivo.setForeground(C_GRIS);
         lblChatActivo.setBounds(16, 15, w - 32, 24);
         header.add(lblChatActivo);
         area.add(header);
- 
+
         // area de mensajes
         pnlMensajes = new JPanel();
         pnlMensajes.setLayout(new BoxLayout(pnlMensajes, BoxLayout.Y_AXIS));
         pnlMensajes.setBackground(C_FONDO);
         pnlMensajes.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
- 
+
+        int areaH = H - TOPBAR_H;
+
         JScrollPane scrollMsg = new JScrollPane(pnlMensajes);
         scrollMsg.setBorder(BorderFactory.createEmptyBorder());
         scrollMsg.getVerticalScrollBar().setUnitIncrement(14);
         scrollMsg.getVerticalScrollBar().setPreferredSize(new Dimension(4, 0));
-        scrollMsg.setBounds(0, 54, w, H - TOPBAR_H - 54 - 60);
+        scrollMsg.setBounds(0, 54, w, areaH - 54 - 80);
         area.add(scrollMsg);
- 
-        // barra inferior para escribir
+
         JPanel barraEscribir = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -350,8 +398,8 @@ public class Gui_Chats {
             }
         };
         barraEscribir.setBackground(C_BLANCO);
-        barraEscribir.setBounds(0, H - TOPBAR_H - 60, w, 60);
- 
+        barraEscribir.setBounds(0, areaH - 80, w, 70);
+
         txtMensaje = new JTextField("Escribe un mensaje...");
         txtMensaje.setFont(new Font("SansSerif", Font.PLAIN, 13));
         txtMensaje.setForeground(C_GRIS);
@@ -373,71 +421,71 @@ public class Gui_Chats {
         });
         txtMensaje.addActionListener(e -> enviarTexto());
         barraEscribir.add(txtMensaje);
- 
+
         JButton btnSticker = crearBotonSimple("🙂");
         btnSticker.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
         btnSticker.setBounds(w - 140, 12, 44, 36);
         btnSticker.addActionListener(e -> mostrarSelectorSticker());
         barraEscribir.add(btnSticker);
- 
+
         JButton btnEnviar = crearBotonAzul("Enviar");
         btnEnviar.setBounds(w - 90, 12, 76, 36);
         btnEnviar.addActionListener(e -> enviarTexto());
         barraEscribir.add(btnEnviar);
- 
+
         area.add(barraEscribir);
         return area;
     }
- 
+
     private void abrirChat(String otro) {
         chatAbierto = otro;
         lblChatActivo.setText("@" + otro);
         lblChatActivo.setForeground(C_TEXTO);
- 
+
         Conversacion conv = new Conversacion(usuarioActual, otro);
         conv.marcarTodosLeidos();
- 
+
         pnlMensajes.removeAll();
- 
+
         for (Mensaje m : conv.getMensajes()) {
             boolean esMio = m.getDe().equals(usuarioActual);
             pnlMensajes.add(crearBurbuja(m, esMio));
             pnlMensajes.add(Box.createVerticalStrut(6));
         }
- 
+
         pnlMensajes.revalidate();
         pnlMensajes.repaint();
         cargarListaConversaciones();
- 
+
         // scroll al fondo
         SwingUtilities.invokeLater(() -> {
             JScrollPane sc = (JScrollPane) pnlMensajes.getParent().getParent();
             sc.getVerticalScrollBar().setValue(sc.getVerticalScrollBar().getMaximum());
         });
     }
- 
+
     private void enviarTexto() {
         if (chatAbierto == null) return;
         String texto = txtMensaje.getText().trim();
         if (texto.isEmpty() || texto.equals("Escribe un mensaje...")) return;
- 
+
         Mensaje m = new MensajeTexto(usuarioActual, chatAbierto, texto);
         new Conversacion(usuarioActual, chatAbierto).enviar(m);
- 
+
         txtMensaje.setText("");
         txtMensaje.setForeground(C_TEXTO);
         abrirChat(chatAbierto);
     }
- 
+
     private void mostrarSelectorSticker() {
         if (chatAbierto == null) return;
-        List<String> stickers = SistemaArchivos.getStickersUsuario(usuarioActual);
- 
+        List<String> stickers = GestorArchivos.getStickersUsuario(usuarioActual);
+
         JDialog dlg = new JDialog(ventana, "Stickers", true);
         dlg.setLayout(new FlowLayout(FlowLayout.LEFT, 8, 8));
         dlg.setSize(320, 200);
         dlg.setLocationRelativeTo(ventana);
- 
+
         for (String s : stickers) {
             JButton btn = new JButton(s.replace(".png",""));
             btn.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -450,19 +498,19 @@ public class Gui_Chats {
             });
             dlg.add(btn);
         }
- 
+
         dlg.setVisible(true);
     }
- 
+
     private JPanel crearBurbuja(Mensaje m, boolean esMio) {
         String texto = m.getTipo().equals("sticker")
             ? "[Sticker: " + m.getContenido().replace(".png","") + "]"
             : m.getContenido();
- 
+
         JPanel contenedor = new JPanel(new FlowLayout(esMio ? FlowLayout.RIGHT : FlowLayout.LEFT, 0, 0));
         contenedor.setOpaque(false);
         contenedor.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
- 
+
         JLabel burbuja = new JLabel("<html><div style='width:240px;padding:4px'>" + texto + "</div></html>") {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -477,21 +525,40 @@ public class Gui_Chats {
         burbuja.setFont(new Font("SansSerif", Font.PLAIN, 13));
         burbuja.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         burbuja.setOpaque(false);
- 
+
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
         wrapper.add(burbuja, esMio ? BorderLayout.EAST : BorderLayout.WEST);
- 
+
         JLabel lblHora = new JLabel(m.getHora());
         lblHora.setFont(new Font("SansSerif", Font.PLAIN, 10));
         lblHora.setForeground(C_GRIS);
         lblHora.setHorizontalAlignment(esMio ? SwingConstants.RIGHT : SwingConstants.LEFT);
         wrapper.add(lblHora, BorderLayout.SOUTH);
- 
+
         contenedor.add(wrapper);
         return contenedor;
     }
- 
+
+    private void mostrarDialogoNuevoChat() {
+        List<String> todos = GestorArchivos.getTodosLosUsuarios();
+        todos.remove(usuarioActual.toLowerCase());
+
+        String[] opciones = todos.toArray(new String[0]);
+        if (opciones.length == 0) {
+            JOptionPane.showMessageDialog(ventana, "No hay otros usuarios registrados.");
+            return;
+        }
+
+        String seleccionado = (String) JOptionPane.showInputDialog(
+            ventana, "Selecciona un usuario:", "Nueva conversacion",
+            JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+
+        if (seleccionado != null && !seleccionado.isEmpty()) {
+            abrirChat(seleccionado);
+        }
+    }
+
     private void limpiarAreaChat() {
         lblChatActivo.setText("Selecciona una conversacion");
         lblChatActivo.setForeground(C_GRIS);
@@ -499,16 +566,9 @@ public class Gui_Chats {
         pnlMensajes.revalidate();
         pnlMensajes.repaint();
     }
- 
-    private Color colorDeUsuario(String username) {
-        int hash = Math.abs(username.hashCode());
-        Color[] colores = {
-            new Color(70,130,180), new Color(180,80,80), new Color(80,160,80),
-            new Color(180,140,50), new Color(130,80,180), new Color(80,160,160)
-        };
-        return colores[hash % colores.length];
-    }
- 
+
+    private Color colorDeUsuario(String username) { return new Color(180, 180, 180); }
+
     private JPanel crearAvatar(int size, Color color) {
         JPanel p = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
@@ -523,7 +583,7 @@ public class Gui_Chats {
         p.setOpaque(false);
         return p;
     }
- 
+
     private JButton crearBotonAzul(String texto) {
         JButton btn = new JButton(texto) {
             @Override protected void paintComponent(Graphics g) {
@@ -543,7 +603,7 @@ public class Gui_Chats {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
- 
+
     private JButton crearBotonSimple(String texto) {
         JButton btn = new JButton(texto) {
             @Override protected void paintComponent(Graphics g) {

@@ -1,47 +1,58 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package proyecto_insta;
 
+import Logica.*;
+import Logica.GestorUsuarios;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-import Logica.*;
-import Absrtact.*;
 
+/**
+ *
+ * @author Rogelio
+ */
 public class Gui_Buscar {
 
-    private static final Color C_BORDE      = new Color(219, 219, 219);
-    private static final Color C_FONDO      = new Color(250, 250, 250);
-    private static final Color C_TEXTO      = new Color(38,  38,  38);
-    private static final Color C_GRIS       = new Color(142, 142, 142);
-    private static final Color C_BLANCO     = Color.WHITE;
-    private static final Color C_FONDO_CAMP = new Color(239, 239, 239);
-    private static final Color C_HOVER      = new Color(245, 245, 245);
+    private static final Color BORDE = new Color(219, 219, 219);
+    private static final Color FONDO = new Color(250, 250, 250);
+    private static final Color TEXTO = new Color(38,  38,  38);
+    private static final Color GRIS = new Color(142, 142, 142);
+    private static final Color AZUL = new Color(0,   149, 246);
+    private static final Color BLANCO = Color.WHITE;
+    private static final Color FONDO_CAMP = new Color(239, 239, 239);
+    private static final Color HOVER = new Color(245, 245, 245);
 
     private static final int W         = 1366;
     private static final int H         = 768;
     private static final int TOPBAR_H  = 54;
     private static final int SIDEBAR_W = 244;
 
-    private final JFrame     ventana;
-    private final CardLayout cardLayout;
-    private final JPanel     pnlCards;
-    private final String     usuarioActual;
+    private final JFrame        ventana;
+    private final Gui_Navegador nav;
+    private final String        usuarioActual;
 
     private JTextField txtBuscar;
+    private JPanel     pnlResultados;
+    private JLabel     lblRecientes;
     private JLabel     lblSinResultados;
 
-    public Gui_Buscar(JFrame ventana, CardLayout cardLayout, JPanel pnlCards, String usuarioActual) {
+    public Gui_Buscar(JFrame ventana, Gui_Navegador nav, String usuarioActual) {
         this.ventana       = ventana;
-        this.cardLayout    = cardLayout;
-        this.pnlCards      = pnlCards;
+        this.nav           = nav;
         this.usuarioActual = usuarioActual;
     }
 
     public JPanel construirPantalla() {
         JPanel panel = new JPanel(null);
-        panel.setBackground(C_FONDO);
+        panel.setBackground(FONDO);
         panel.setBounds(0, 0, W, H);
         panel.add(construirTopBar());
         panel.add(construirSidebar());
@@ -51,17 +62,19 @@ public class Gui_Buscar {
 
     private JPanel construirTopBar() {
         JPanel bar = new JPanel(null) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(C_BORDE);
+                g.setColor(BORDE);
                 g.drawLine(0, TOPBAR_H - 1, W, TOPBAR_H - 1);
             }
         };
-        bar.setBackground(C_BLANCO);
+        bar.setBackground(BLANCO);
         bar.setBounds(0, 0, W, TOPBAR_H);
 
         JLabel lblLogo = new JLabel("Instagram") {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
@@ -81,22 +94,46 @@ public class Gui_Buscar {
 
     private JPanel construirSidebar() {
         JPanel side = new JPanel(null) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(C_BORDE);
+                g.setColor(BORDE);
                 g.drawLine(SIDEBAR_W - 1, 0, SIDEBAR_W - 1, H);
             }
         };
-        side.setBackground(C_BLANCO);
+        side.setBackground(BLANCO);
         side.setBounds(0, TOPBAR_H, SIDEBAR_W, H - TOPBAR_H);
 
-        JPanel fotoPerfil = crearAvatar(56, new Color(180, 160, 220));
+        Usuario _uSide = Usuario.cargarDesdeArchivo(usuarioActual);
+        String _rutaSide = _uSide != null ? _uSide.getRutaFoto() : null;
+        JPanel fotoPerfil = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (_rutaSide != null && !_rutaSide.isEmpty()) {
+                    try {
+                        Image img = new ImageIcon(_rutaSide).getImage().getScaledInstance(56, 56, Image.SCALE_SMOOTH);
+                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
+                        g2.drawImage(img, 0, 0, this);
+                    } catch (Exception ex) {
+                        g2.setColor(colorDeUsuario(usuarioActual));
+                        g2.fillOval(0, 0, 56, 56);
+                    }
+                } else {
+                    g2.setColor(colorDeUsuario(usuarioActual));
+                    g2.fillOval(0, 0, 56, 56);
+                }
+                g2.dispose();
+            }
+        };
+        fotoPerfil.setOpaque(false);
         fotoPerfil.setBounds(16, 20, 56, 56);
         side.add(fotoPerfil);
 
         JLabel lblNombre = new JLabel(usuarioActual);
         lblNombre.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblNombre.setForeground(C_TEXTO);
+        lblNombre.setForeground(TEXTO);
         lblNombre.setBounds(84, 26, 144, 18);
         side.add(lblNombre);
 
@@ -105,10 +142,15 @@ public class Gui_Buscar {
         lblVerPerfil.setForeground(new Color(0, 149, 246));
         lblVerPerfil.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         lblVerPerfil.setBounds(84, 44, 80, 16);
+        lblVerPerfil.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) { nav.ir("perfil"); }
+        });
         side.add(lblVerPerfil);
 
+
         JSeparator sep = new JSeparator();
-        sep.setForeground(C_BORDE);
+        sep.setForeground(BORDE);
         sep.setBounds(16, 90, SIDEBAR_W - 32, 1);
         side.add(sep);
 
@@ -120,71 +162,89 @@ public class Gui_Buscar {
             final boolean activo = (idx == 1);
 
             JButton btnNav = new JButton() {
-                @Override protected void paintComponent(Graphics g) {
+                @Override
+                protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    if (activo)                       { g2.setColor(new Color(240,240,255)); g2.fillRoundRect(0,0,getWidth(),getHeight(),8,8); }
-                    else if (getModel().isRollover()) { g2.setColor(C_HOVER);               g2.fillRoundRect(0,0,getWidth(),getHeight(),8,8); }
+                    if (activo) {
+                        g2.setColor(new Color(240, 240, 255));
+                        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    } else if (getModel().isRollover()) {
+                        g2.setColor(HOVER);
+                        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    }
                     int cx = 28, cy = getHeight() / 2;
-                    g2.setColor(activo ? new Color(88,81,219) : C_TEXTO);
+                    g2.setColor(activo ? new Color(88, 81, 219) : TEXTO);
                     g2.setStroke(new BasicStroke(activo ? 2.2f : 1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     switch (idx) {
                         case 0:
-                            int[] hx={cx,cx+10,cx+10,cx-10,cx-10}, hy={cy-10,cy,cy+10,cy+10,cy};
-                            g2.drawPolygon(hx,hy,5); g2.drawRect(cx-4,cy+1,8,9); break;
+                            int[] hx = {cx,cx+10,cx+10,cx-10,cx-10};
+                            int[] hy = {cy-10,cy,cy+10,cy+10,cy};
+                            g2.drawPolygon(hx, hy, 5);
+                            g2.drawRect(cx-4, cy+1, 8, 9);
+                            break;
                         case 1:
-                            g2.drawOval(cx-9,cy-10,18,18); g2.drawLine(cx+7,cy+6,cx+12,cy+11); break;
+                            g2.drawOval(cx-9, cy-10, 18, 18);
+                            g2.drawLine(cx+7, cy+6, cx+12, cy+11);
+                            break;
                         case 2:
-                            g2.drawRoundRect(cx-11,cy-11,22,22,6,6);
-                            g2.drawLine(cx,cy-6,cx,cy+6); g2.drawLine(cx-6,cy,cx+6,cy); break;
+                            g2.drawRoundRect(cx-11, cy-11, 22, 22, 6, 6);
+                            g2.drawLine(cx, cy-6, cx, cy+6);
+                            g2.drawLine(cx-6, cy, cx+6, cy);
+                            break;
                         case 3:
-                            g2.drawRoundRect(cx-11,cy-9,22,17,5,5); g2.drawLine(cx-5,cy+8,cx-8,cy+12); break;
+                            g2.drawRoundRect(cx-11, cy-9, 22, 17, 5, 5);
+                            g2.drawLine(cx-5, cy+8, cx-8, cy+12);
+                            break;
                         case 4:
-                            g2.drawOval(cx-10,cy-10,20,20); g2.fillOval(cx-4,cy-6,8,8);
-                            g2.drawArc(cx-8,cy+1,16,12,0,180); break;
+                            g2.drawOval(cx-10, cy-10, 20, 20);
+                            g2.fillOval(cx-4, cy-6, 8, 8);
+                            g2.drawArc(cx-8, cy+1, 16, 12, 0, 180);
+                            break;
                     }
                     g2.setFont(new Font("SansSerif", activo ? Font.BOLD : Font.PLAIN, 14));
-                    g2.setColor(activo ? new Color(88,81,219) : C_TEXTO);
+                    g2.setColor(activo ? new Color(88, 81, 219) : TEXTO);
                     FontMetrics fm = g2.getFontMetrics();
-                    g2.drawString(opNombres[idx], 52, cy + fm.getAscent()/2 - 1);
+                    g2.drawString(opNombres[idx], 52, cy + fm.getAscent() / 2 - 1);
                     g2.dispose();
                 }
             };
             btnNav.setBounds(8, opY[i], SIDEBAR_W - 16, 44);
-            btnNav.setOpaque(false); btnNav.setContentAreaFilled(false);
-            btnNav.setBorderPainted(false); btnNav.setFocusPainted(false);
+            btnNav.setOpaque(false);
+            btnNav.setContentAreaFilled(false);
+            btnNav.setBorderPainted(false);
+            btnNav.setFocusPainted(false);
             btnNav.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            if (idx == 0) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "home"));
-            if (idx == 2) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "crear"));
-            if (idx == 3) btnNav.addActionListener(e -> cardLayout.show(pnlCards, "chats"));
+            if (idx == 0) btnNav.addActionListener(e -> nav.ir("home"));
+            if (idx == 2) btnNav.addActionListener(e -> nav.ir("crear"));
+            if (idx == 3) btnNav.addActionListener(e -> nav.ir("chats"));
+            if (idx == 4) btnNav.addActionListener(e -> nav.ir("perfil"));
             side.add(btnNav);
         }
 
         JLabel lblFooter = new JLabel("© 2025 Instagram from Meta");
         lblFooter.setFont(new Font("SansSerif", Font.PLAIN, 10));
-        lblFooter.setForeground(C_GRIS);
+        lblFooter.setForeground(GRIS);
         lblFooter.setBounds(16, H - TOPBAR_H - 28, 220, 14);
         side.add(lblFooter);
-
         return side;
     }
 
     private JPanel construirAreaBusqueda() {
         int areaX = SIDEBAR_W;
         int areaW = W - SIDEBAR_W;
-        int areaH = H - TOPBAR_H;
 
         JPanel area = new JPanel(null);
-        area.setBackground(C_FONDO);
-        area.setBounds(areaX, TOPBAR_H, areaW, areaH);
+        area.setBackground(FONDO);
+        area.setBounds(areaX, TOPBAR_H, areaW, H - TOPBAR_H);
 
-        int campW = 400, campH = 40;
+        int campW = 420, campH = 40;
         int campX = (areaW - campW) / 2;
 
         txtBuscar = new JTextField();
         txtBuscar.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        txtBuscar.setForeground(C_TEXTO);
-        txtBuscar.setBackground(C_FONDO_CAMP);
+        txtBuscar.setForeground(TEXTO);
+        txtBuscar.setBackground(FONDO_CAMP);
         txtBuscar.setBorder(BorderFactory.createCompoundBorder(
             new RoundedBorder(12),
             BorderFactory.createEmptyBorder(0, 42, 0, 10)
@@ -193,10 +253,11 @@ public class Gui_Buscar {
         area.add(txtBuscar);
 
         JLabel lblLupa = new JLabel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(C_GRIS);
+                g2.setColor(GRIS);
                 g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawOval(6, 9, 16, 16);
                 g2.drawLine(20, 23, 26, 29);
@@ -207,78 +268,67 @@ public class Gui_Buscar {
         area.add(lblLupa);
         area.setComponentZOrder(lblLupa, 0);
 
-        JLabel lblPlaceholder = new JLabel("Buscar");
+        JLabel lblPlaceholder = new JLabel("Buscar usuarios o #hashtags");
         lblPlaceholder.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblPlaceholder.setForeground(C_GRIS);
+        lblPlaceholder.setForeground(GRIS);
         lblPlaceholder.setBounds(campX + 42, 28, campW - 54, campH);
         area.add(lblPlaceholder);
         area.setComponentZOrder(lblPlaceholder, 0);
 
         txtBuscar.addFocusListener(new FocusAdapter() {
-            @Override public void focusGained(FocusEvent e) { lblPlaceholder.setVisible(false); }
-            @Override public void focusLost(FocusEvent e)   { lblPlaceholder.setVisible(txtBuscar.getText().isEmpty()); }
+            @Override
+            public void focusGained(FocusEvent e) {
+                lblPlaceholder.setVisible(false);
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                lblPlaceholder.setVisible(txtBuscar.getText().isEmpty());
+            }
         });
 
-        JLabel lblRecientes = new JLabel("Recientes");
+        lblRecientes = new JLabel("Recientes");
         lblRecientes.setFont(new Font("SansSerif", Font.BOLD, 15));
-        lblRecientes.setForeground(C_TEXTO);
-        lblRecientes.setBounds(campX - 20, 86, 200, 26);
+        lblRecientes.setForeground(TEXTO);
+        lblRecientes.setBounds(campX, 86, 200, 26);
         area.add(lblRecientes);
 
-        lblSinResultados = new JLabel("", SwingConstants.LEFT);
+        lblSinResultados = new JLabel("");
         lblSinResultados.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        lblSinResultados.setForeground(C_GRIS);
+        lblSinResultados.setForeground(GRIS);
         lblSinResultados.setVisible(false);
-        lblSinResultados.setBounds(campX - 20, 86, campW + 40, 26);
+        lblSinResultados.setBounds(campX, 86, campW, 26);
         area.add(lblSinResultados);
 
-        Color[]  recColors  = { new Color(70,130,180), new Color(210,180,140), new Color(0,102,51), new Color(180,30,30), new Color(180,160,220) };
-        String[] recNombres = { "PC Components HN", "ZARA Honduras", "UNITEC Honduras", "Proceso Digital HN", usuarioActual };
-        String[] recHandles = { "pc_components_hn", "zara_honduras", "unitec_honduras", "proceso_digital", "mi_cuenta" };
+        pnlResultados = new JPanel();
+        pnlResultados.setLayout(new BoxLayout(pnlResultados, BoxLayout.Y_AXIS));
+        pnlResultados.setBackground(FONDO);
 
-        int ry = 120;
-        for (int i = 0; i < recNombres.length; i++) {
-            JPanel fila = new JPanel(null);
-            fila.setOpaque(false);
-            fila.setBounds(campX - 20, ry, campW + 40, 48);
-            area.add(fila);
+        JScrollPane scrollResultados = new JScrollPane(pnlResultados);
+        scrollResultados.setBorder(BorderFactory.createEmptyBorder());
+        scrollResultados.getVerticalScrollBar().setPreferredSize(new Dimension(4, 0));
+        scrollResultados.setBounds(campX - 10, 118, campW + 20, H - TOPBAR_H - 130);
+        area.add(scrollResultados);
 
-            JPanel av = crearAvatar(38, recColors[i]);
-            av.setBounds(0, 5, 38, 38);
-            fila.add(av);
-
-            JLabel lU = new JLabel(recNombres[i]);
-            lU.setFont(new Font("SansSerif", Font.BOLD, 13));
-            lU.setForeground(C_TEXTO);
-            lU.setBounds(50, 8, 250, 16);
-            fila.add(lU);
-
-            JLabel lS = new JLabel("@" + recHandles[i] + " · Instagram");
-            lS.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            lS.setForeground(C_GRIS);
-            lS.setBounds(50, 26, 280, 14);
-            fila.add(lS);
-
-            JLabel lblX = new JLabel("✕");
-            lblX.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            lblX.setForeground(C_GRIS);
-            lblX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            lblX.setBounds(campW + 8, 14, 20, 20);
-            lblX.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) { fila.setVisible(false); }
-            });
-            fila.add(lblX);
-
-            ry += 50;
-        }
+        cargarRecientes(campW);
 
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
             void actualizar() {
                 String texto = txtBuscar.getText().trim();
-                boolean vacio = texto.isEmpty();
-                lblRecientes.setVisible(vacio);
-                lblSinResultados.setVisible(!vacio);
-                if (!vacio) lblSinResultados.setText("Buscar \"" + texto + "\"...");
+                if (texto.isEmpty()) {
+                    lblRecientes.setVisible(true);
+                    lblSinResultados.setVisible(false);
+                    cargarRecientes(campW);
+                } else if (texto.startsWith("#")) {
+                    lblRecientes.setVisible(false);
+                    lblSinResultados.setVisible(true);
+                    lblSinResultados.setText("Resultados para " + texto);
+                    buscarHashtag(texto, campW);
+                } else {
+                    lblRecientes.setVisible(false);
+                    lblSinResultados.setVisible(true);
+                    lblSinResultados.setText("Resultados para \"" + texto + "\"");
+                    buscarUsuarios(texto, campW);
+                }
             }
             @Override public void insertUpdate(DocumentEvent e)  { actualizar(); }
             @Override public void removeUpdate(DocumentEvent e)  { actualizar(); }
@@ -288,16 +338,201 @@ public class Gui_Buscar {
         return area;
     }
 
+    private void cargarRecientes(int campW) {
+        pnlResultados.removeAll();
+        Usuario yo = Usuario.cargarDesdeArchivo(usuarioActual);
+        List<String> recientes = yo != null ? yo.getFollowing() : new java.util.ArrayList<>();
+        if (recientes.isEmpty()) {
+            JLabel lbl = new JLabel("No sigues a nadie aun.");
+            lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            lbl.setForeground(GRIS);
+            lbl.setBorder(BorderFactory.createEmptyBorder(10, 4, 0, 0));
+            pnlResultados.add(lbl);
+        }
+        for (String u : recientes) {
+            Usuario usr = Usuario.cargarDesdeArchivo(u);
+            if (usr != null) pnlResultados.add(crearFilaUsuario(usr, campW));
+        }
+        pnlResultados.revalidate();
+        pnlResultados.repaint();
+    }
+
+    private void buscarUsuarios(String texto, int campW) {
+        pnlResultados.removeAll();
+        List<String> resultados = GestorUsuarios.buscarPorCoincidencia(texto);
+        resultados.remove(usuarioActual.toLowerCase());
+        if (resultados.isEmpty()) {
+            JLabel lbl = new JLabel("Sin resultados para \"" + texto + "\"");
+            lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            lbl.setForeground(GRIS);
+            lbl.setBorder(BorderFactory.createEmptyBorder(10, 4, 0, 0));
+            pnlResultados.add(lbl);
+        }
+        for (String u : resultados) {
+            Usuario usr = Usuario.cargarDesdeArchivo(u);
+            if (usr != null) pnlResultados.add(crearFilaUsuario(usr, campW));
+        }
+        pnlResultados.revalidate();
+        pnlResultados.repaint();
+    }
+
+    private void buscarHashtag(String tag, int campW) {
+        pnlResultados.removeAll();
+        ListaPublicaciones lista = new ListaPublicaciones();
+        List<Publicacion> pubs = lista.buscarPorHashtag(tag);
+        if (pubs.isEmpty()) {
+            JLabel lbl = new JLabel("Sin publicaciones con " + tag);
+            lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            lbl.setForeground(GRIS);
+            lbl.setBorder(BorderFactory.createEmptyBorder(10, 4, 0, 0));
+            pnlResultados.add(lbl);
+        }
+        for (Publicacion p : pubs) {
+            pnlResultados.add(crearFilaPublicacion(p, campW));
+        }
+        pnlResultados.revalidate();
+        pnlResultados.repaint();
+    }
+
+    private JPanel crearFilaUsuario(Usuario u, int campW) {
+        JPanel fila = new JPanel(null);
+        fila.setOpaque(false);
+        fila.setMaximumSize(new Dimension(campW + 20, 56));
+        fila.setPreferredSize(new Dimension(campW + 20, 56));
+        fila.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        JPanel av = crearAvatar(38, colorDeUsuario(u.getUsername()));
+        av.setBounds(4, 9, 38, 38);
+        fila.add(av);
+
+        JLabel lNombre = new JLabel(u.getNombre() != null ? u.getNombre() : u.getUsername());
+        lNombre.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lNombre.setForeground(TEXTO);
+        lNombre.setBounds(52, 10, 200, 16);
+        fila.add(lNombre);
+
+        JLabel lHandle = new JLabel("@" + u.getUsername() + "  ·  " + u.getTipoCuenta());
+        lHandle.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        lHandle.setForeground(GRIS);
+        lHandle.setBounds(52, 28, 250, 14);
+        fila.add(lHandle);
+
+        Usuario yo = Usuario.cargarDesdeArchivo(usuarioActual);
+        boolean sigue = yo != null && yo.sigueA(u.getUsername());
+        JLabel btnSeg = new JLabel(sigue ? "Siguiendo" : "Seguir");
+        btnSeg.setFont(new Font("SansSerif", sigue ? Font.PLAIN : Font.BOLD, 12));
+        btnSeg.setForeground(sigue ? GRIS : AZUL);
+        btnSeg.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnSeg.setBounds(campW - 120, 20, 70, 16);
+        btnSeg.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                e.consume();
+                boolean siguiendo = btnSeg.getText().equals("Siguiendo");
+                if (siguiendo) {
+                    GestorUsuarios.dejarDeSeguir(usuarioActual, u.getUsername());
+                    btnSeg.setText("Seguir");
+                    btnSeg.setFont(new Font("SansSerif", Font.BOLD, 12));
+                    btnSeg.setForeground(AZUL);
+                } else {
+                    GestorUsuarios.seguir(usuarioActual, u.getUsername());
+                    btnSeg.setText("Siguiendo");
+                    btnSeg.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                    btnSeg.setForeground(GRIS);
+                }
+            }
+        });
+        fila.add(btnSeg);
+
+        JLabel btnVerPerfil = new JLabel("Ver perfil");
+        btnVerPerfil.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btnVerPerfil.setForeground(TEXTO);
+        btnVerPerfil.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnVerPerfil.setBounds(campW - 40, 20, 60, 16);
+        btnVerPerfil.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                e.consume();
+                abrirPerfil(u.getUsername());
+            }
+        });
+        fila.add(btnVerPerfil);
+
+        fila.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                abrirPerfil(u.getUsername());
+            }
+        });
+
+        JSeparator sep = new JSeparator();
+        sep.setForeground(BORDE);
+        sep.setBounds(0, 54, campW + 20, 1);
+        fila.add(sep);
+
+        return fila;
+    }
+
+    private JPanel crearFilaPublicacion(Publicacion p, int campW) {
+        JPanel fila = new JPanel(null);
+        fila.setOpaque(false);
+        fila.setMaximumSize(new Dimension(campW + 20, 60));
+        fila.setPreferredSize(new Dimension(campW + 20, 60));
+
+        JPanel av = crearAvatar(38, colorDeUsuario(p.getAutor()));
+        av.setBounds(4, 11, 38, 38);
+        fila.add(av);
+
+        JLabel lAutor = new JLabel("@" + p.getAutor());
+        lAutor.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lAutor.setForeground(TEXTO);
+        lAutor.setBounds(52, 10, 200, 15);
+        fila.add(lAutor);
+
+        String preview = p.getContenido().length() > 60 ? p.getContenido().substring(0, 60) + "..." : p.getContenido();
+        JLabel lContenido = new JLabel(preview);
+        lContenido.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        lContenido.setForeground(GRIS);
+        lContenido.setBounds(52, 27, campW - 60, 14);
+        fila.add(lContenido);
+
+        JLabel lFecha = new JLabel(p.getFecha() + " " + p.getHora());
+        lFecha.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        lFecha.setForeground(GRIS);
+        lFecha.setBounds(52, 43, 200, 12);
+        fila.add(lFecha);
+
+        JSeparator sep = new JSeparator();
+        sep.setForeground(BORDE);
+        sep.setBounds(0, 58, campW + 20, 1);
+        fila.add(sep);
+
+        return fila;
+    }
+
+    private void abrirPerfil(String username) {
+        String key = "perfil_" + username;
+        Gui_Perfil guiPerfil = new Gui_Perfil(ventana, nav, usuarioActual, username);
+        nav.getPnlCards().add(guiPerfil.construirPantalla(), key);
+        nav.ir(key);
+    }
+
+    private Color colorDeUsuario(String username) { return new Color(180, 180, 180); }
+
     private JPanel crearAvatar(int size, Color color) {
         JPanel p = new JPanel(null) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
                 g2.fillOval(0, 0, size, size);
                 g2.dispose();
             }
-            @Override public Dimension getPreferredSize() { return new Dimension(size, size); }
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(size, size);
+            }
         };
         p.setOpaque(false);
         return p;
@@ -305,13 +540,26 @@ public class Gui_Buscar {
 
     private static class RoundedBorder implements Border {
         private final int radius;
-        RoundedBorder(int radius) { this.radius = radius; }
-        @Override public Insets getBorderInsets(Component c) { return new Insets(2,2,2,2); }
-        @Override public boolean isBorderOpaque() { return false; }
-        @Override public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
+
+        RoundedBorder(int radius) {
+            this.radius = radius;
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(2, 2, 2, 2);
+        }
+
+        @Override
+        public boolean isBorderOpaque() {
+            return false;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(C_BORDE);
+            g2.setColor(BORDE);
             g2.drawRoundRect(x, y, w-1, h-1, radius, radius);
             g2.dispose();
         }
