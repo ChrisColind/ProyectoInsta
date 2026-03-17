@@ -10,6 +10,8 @@ import PEnums.Enums.TipoMultimedia;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -119,9 +121,11 @@ public class Gui_Crear {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 if (_rutaSide != null && !_rutaSide.isEmpty()) {
                     try {
-                        Image img = new ImageIcon(_rutaSide).getImage().getScaledInstance(56, 56, Image.SCALE_SMOOTH);
-                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
-                        g2.drawImage(img, 0, 0, this);
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(_rutaSide).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
+                            g2.drawImage(img, 0, 0, 56, 56, this);
+                        }
                     } catch (Exception ex) {
                         g2.setColor(colorDeUsuario(usuarioActual));
                         g2.fillOval(0, 0, 56, 56);
@@ -287,7 +291,7 @@ public class Gui_Crear {
         JButton btnElegirImg = crearBotonSecundario("Elegir imagen");
         btnElegirImg.setBounds(col1X + 265, y - 2, 95, 24);
         btnElegirImg.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
+            JFileChooser fc = new JFileChooser(System.getProperty("user.home") + "/Downloads");
             fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagenes", "jpg", "jpeg", "png", "gif", "bmp", "webp"));
             fc.setDialogTitle("Selecciona una imagen");
             if (fc.showOpenDialog(ventana) == JFileChooser.APPROVE_OPTION) {
@@ -398,7 +402,7 @@ public class Gui_Crear {
         area.add(lblHash);
         y2 += 24;
 
-        txtHashtags = crearCampo("Ej: #foto #nature #travel", col2X, y2, 460, 36);
+        txtHashtags = crearCampo("#foto #nature #travel", col2X, y2, 460, 36);
         area.add(txtHashtags);
         y2 += 46;
 
@@ -409,7 +413,7 @@ public class Gui_Crear {
         area.add(lblMenc);
         y2 += 24;
 
-        txtMenciones = crearCampo("Ej: @usuario1 @usuario2", col2X, y2, 460, 36);
+        txtMenciones = crearCampo("@usuario1 @usuario2", col2X, y2, 460, 36);
         area.add(txtMenciones);
         y2 += 50;
 
@@ -451,8 +455,8 @@ public class Gui_Crear {
         String hashtags  = txtHashtags.getText().trim();
         String menciones = txtMenciones.getText().trim();
 
-        if (hashtags.equals("Ej: #foto #nature #travel"))  hashtags  = "";
-        if (menciones.equals("Ej: @usuario1 @usuario2"))   menciones = "";
+        if (hashtags.equals("#foto #nature #travel"))  hashtags  = "";
+        if (menciones.equals("@usuario1 @usuario2"))   menciones = "";
 
         TipoMultimedia tipoMultimedia = rutaImagen != null ? TipoMultimedia.IMAGEN : TipoMultimedia.NINGUNO;
 
@@ -466,9 +470,9 @@ public class Gui_Crear {
 
     private void limpiarFormulario() {
         txtContenido.setText("");
-        txtHashtags.setText("Ej: #foto #nature #travel");
+        txtHashtags.setText("#foto #nature #travel");
         txtHashtags.setForeground(C_GRIS);
-        txtMenciones.setText("Ej: @usuario1 @usuario2");
+        txtMenciones.setText("@usuario1 @usuario2");
         txtMenciones.setForeground(C_GRIS);
         lblNombreArchivo.setText("Ningun archivo seleccionado");
         lblNombreArchivo.setForeground(C_GRIS);

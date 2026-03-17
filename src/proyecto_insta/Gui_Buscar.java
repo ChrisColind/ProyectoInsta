@@ -10,6 +10,8 @@ import Logica.GestorUsuarios;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -113,9 +115,11 @@ public class Gui_Buscar {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 if (_rutaSide != null && !_rutaSide.isEmpty()) {
                     try {
-                        Image img = new ImageIcon(_rutaSide).getImage().getScaledInstance(56, 56, Image.SCALE_SMOOTH);
-                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
-                        g2.drawImage(img, 0, 0, this);
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(_rutaSide).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
+                            g2.drawImage(img, 0, 0, 56, 56, this);
+                        }
                     } catch (Exception ex) {
                         g2.setColor(colorDeUsuario(usuarioActual));
                         g2.fillOval(0, 0, 56, 56);

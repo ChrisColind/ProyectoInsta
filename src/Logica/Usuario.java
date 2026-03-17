@@ -8,6 +8,7 @@ package Logica;
 import PEnums.Enums.EstadoCuenta;
 import PEnums.Enums.Genero;
 import PEnums.Enums.TipoCuenta;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class Usuario extends EntidadBase {
         return username + " | " + nombreCompleto + " | " + tipoCuenta + " | " + estado;
     }
 
-    public void guardar() {
+    public void guardar() { 
         GestorArchivos.crearEstructuraUsuario(username);
         String datos = "username=" + username + "\n"
                 + "nombre=" + nombreCompleto + "\n"
@@ -81,7 +82,10 @@ public class Usuario extends EntidadBase {
             }
         }
         u.carpeta = GestorArchivos.RAIZ + u.username + "/";
-        if (u.rutaFoto != null && u.rutaFoto.isEmpty()) {
+        if (u.rutaFoto != null && !u.rutaFoto.isEmpty()) {
+            String nombreArchivo = new File(u.rutaFoto).getName();
+            u.rutaFoto = GestorArchivos.RAIZ + u.username + "/imagenes/" + nombreArchivo;
+        } else {
             u.rutaFoto = null;
         }
         return u;

@@ -139,6 +139,12 @@ public class Publicacion implements InteractuarUser {
                 GestorArchivos.RAIZ + autorUsername + "/publicaciones/" + id + ".likes"
         ).size();
     }
+    
+    public boolean yaLeGustaA(String username) {
+        String ruta = GestorArchivos.RAIZ + autorUsername + "/publicaciones/" + id + ".likes";
+        List<String> likes = GestorArchivos.leerLineas(ruta);
+        return likes.contains(username.toLowerCase());
+    }
 
     public void guardar() {
         String carpeta = GestorArchivos.RAIZ + autorUsername + "/publicaciones/";

@@ -11,8 +11,14 @@ import Logica.GestorArchivos;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import javax.swing.*;
+import static proyecto_insta.Gui_Inicio.C_AZUL;
+import static proyecto_insta.Gui_Inicio.C_BLANCO;
+import static proyecto_insta.Gui_Inicio.C_GRIS;
+import static proyecto_insta.Gui_Inicio.C_TEXTO;
 
 /**
  *
@@ -114,9 +120,11 @@ public class Gui_Perfil {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 if (_rutaSide != null && !_rutaSide.isEmpty()) {
                     try {
-                        Image img = new ImageIcon(_rutaSide).getImage().getScaledInstance(56, 56, Image.SCALE_SMOOTH);
-                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
-                        g2.drawImage(img, 0, 0, this);
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(_rutaSide).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 56, 56));
+                            g2.drawImage(img, 0, 0, 56, 56, this);
+                        }
                     } catch (Exception ex) {
                         g2.setColor(colorDeUsuario(usuarioActual));
                         g2.fillOval(0, 0, 56, 56);
@@ -231,7 +239,7 @@ public class Gui_Perfil {
         return side;
     }
 
-    private JPanel construirAreaPerfil() {
+    private JPanel construirAreaPerfil() {  
         int areaX = SIDEBAR_W;
         int areaW = W - SIDEBAR_W;
 
@@ -260,9 +268,12 @@ public class Gui_Perfil {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 if (rutaFotoPerfil != null && !rutaFotoPerfil.isEmpty()) {
                     try {
-                        Image img = new ImageIcon(rutaFotoPerfil).getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
-                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 90, 90));
-                        g2.drawImage(img, 0, 0, this);
+                        File f = new File(rutaFotoPerfil).getAbsoluteFile();
+                        BufferedImage img = javax.imageio.ImageIO.read(f);
+                        if (img != null) {
+                            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 90, 90));
+                            g2.drawImage(img, 0, 0, 90, 90, this);
+                        }
                     } catch (Exception ex) {
                         g2.setColor(colorDeUsuario(u.getUsername()));
                         g2.fillOval(0, 0, 90, 90);
@@ -433,28 +444,26 @@ public class Gui_Perfil {
     private JPanel crearCeldaPublicacion(Publicacion p, int w, int h) {
         Color color = colorDeUsuario(p.getAutor());
 
+        // Cargar la imagen UNA sola vez, fuera del paintComponent
+        BufferedImage[] imgCache = new BufferedImage[1];
+        String ruta = p.getRutaImagen();
+        if (ruta != null && !ruta.isEmpty()) {
+            try {
+                imgCache[0] = javax.imageio.ImageIO.read(new File(ruta).getAbsoluteFile());
+            } catch (Exception ex) {
+                imgCache[0] = null;
+            }
+        }
+
         JPanel celda = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
-                String ruta = p.getRutaImagen();
-                if (ruta != null && !ruta.isEmpty()) {
-                    try {
-                        ImageIcon icon = new ImageIcon(ruta);
-                        Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-                        g.drawImage(img, 0, 0, this);
-                        return;
-                    } catch (Exception ex) { }
+                if (imgCache[0] != null) {
+                    g.drawImage(imgCache[0], 0, 0, w, h, this);
+                    return;
                 }
                 g.setColor(color.darker());
                 g.fillRect(0, 0, w, h);
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(255, 255, 255, 80));
-                g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                int cx = w / 2, cy = h / 2;
-                g2.drawRoundRect(cx - 16, cy - 10, 32, 22, 6, 6);
-                g2.drawOval(cx - 7, cy - 7, 14, 14);
-                g2.dispose();
             }
         };
         celda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -474,25 +483,31 @@ public class Gui_Perfil {
         dlg.setLocationRelativeTo(ventana);
 
         JPanel contenido = new JPanel(null);
-        contenido.setBackground(BLANCO);
+        contenido.setBackground(C_BLANCO);
 
         JLabel lblFecha = new JLabel(p.getFecha() + " " + p.getHora());
         lblFecha.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        lblFecha.setForeground(GRIS);
+        lblFecha.setForeground(C_GRIS);
         lblFecha.setBounds(16, 12, 440, 16);
         contenido.add(lblFecha);
+
+        // Cargar imagen UNA sola vez antes de crear el panel
+        BufferedImage[] imgCache = new BufferedImage[1];
+        String rutaImg = p.getRutaImagen();
+        if (rutaImg != null && !rutaImg.isEmpty()) {
+            try {
+                imgCache[0] = javax.imageio.ImageIO.read(new File(rutaImg).getAbsoluteFile());
+            } catch (Exception ex) {
+                imgCache[0] = null;
+            }
+        }
 
         JPanel imgPanel = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
-                String ruta = p.getRutaImagen();
-                if (ruta != null && !ruta.isEmpty()) {
-                    try {
-                        ImageIcon icon = new ImageIcon(ruta);
-                        Image img = icon.getImage().getScaledInstance(448, 280, Image.SCALE_SMOOTH);
-                        g.drawImage(img, 0, 0, this);
-                        return;
-                    } catch (Exception ex) { }
+                if (imgCache[0] != null) {
+                    g.drawImage(imgCache[0], 0, 0, 448, 280, this);
+                    return;
                 }
                 g.setColor(colorDeUsuario(p.getAutor()).darker());
                 g.fillRect(0, 0, getWidth(), getHeight());
@@ -503,14 +518,14 @@ public class Gui_Perfil {
 
         JLabel lblContenido = new JLabel("<html><div style='width:440px'>" + p.getContenido() + "</div></html>");
         lblContenido.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        lblContenido.setForeground(TEXTO);
+        lblContenido.setForeground(C_TEXTO);
         lblContenido.setBounds(16, 322, 448, 50);
         contenido.add(lblContenido);
 
         if (p.getHashtags() != null && !p.getHashtags().isEmpty()) {
             JLabel lblHash = new JLabel(p.getHashtags());
             lblHash.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            lblHash.setForeground(AZUL);
+            lblHash.setForeground(C_AZUL);
             lblHash.setBounds(16, 374, 448, 16);
             contenido.add(lblHash);
         }
