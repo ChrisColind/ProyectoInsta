@@ -149,6 +149,23 @@ public class Publicacion implements InteractuarUser {
     public void guardar() {
         String carpeta = GestorArchivos.RAIZ + autorUsername + "/publicaciones/";
         new File(carpeta).mkdirs();
+
+        // Copiar imagen a la carpeta del proyecto
+        if (rutaImagen != null && !rutaImagen.isEmpty()) {
+            try {
+                String ext = rutaImagen.substring(rutaImagen.lastIndexOf('.'));
+                String destino = carpeta + id + ext;
+                java.nio.file.Files.copy(
+                    java.nio.file.Paths.get(rutaImagen),
+                    java.nio.file.Paths.get(destino),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
+                rutaImagen = destino; // actualizar ruta a la local
+            } catch (Exception ex) {
+                System.out.println("Error copiando imagen: " + ex.getMessage());
+            }
+        }
+
         String datos = "id=" + id + "\n"
                 + "autor=" + autorUsername + "\n"
                 + "fecha=" + fecha + "\n"
@@ -196,7 +213,14 @@ public class Publicacion implements InteractuarUser {
         }
         return p;
     }
-
+    
+    public void quitarLike(String username) {
+        String ruta = GestorArchivos.RAIZ + autorUsername + "/publicaciones/" + id + ".likes";
+        List<String> likes = GestorArchivos.leerLineas(ruta);
+        likes.remove(username.toLowerCase());
+        GestorArchivos.sobreescribir(ruta, likes);
+    }
+    
     public static List<Publicacion> cargarTodasDeUsuario(String username) {
         List<Publicacion> lista = new ArrayList<>();
         File carpeta = new File(GestorArchivos.RAIZ + username + "/publicaciones/");

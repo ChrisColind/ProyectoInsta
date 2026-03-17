@@ -35,8 +35,8 @@ public class Gui_Home {
     private static final int H         = 768;
     private static final int TOPBAR_H  = 54;
     private static final int SIDEBAR_W = 244;
-    private static final int RIGHT_W   = 300;
-    private static final int FEED_W    = W - SIDEBAR_W - RIGHT_W;
+    private static final int RIGHT_W   = 0;
+    private static final int FEED_W    = W - SIDEBAR_W;
 
     private final JFrame        ventana;
     private final Gui_Navegador nav;
@@ -55,7 +55,6 @@ public class Gui_Home {
         panel.add(construirTopBar());
         panel.add(construirSidebar());
         panel.add(construirFeed());
-        panel.add(construirPanelDerecho());
         return panel;
     }
 
@@ -314,7 +313,30 @@ public class Gui_Home {
         post.setMinimumSize(new Dimension(postAncho, totalH));
         post.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JPanel av = crearAvatar(38, avatarColor);
+        Usuario uAutor = Usuario.cargarDesdeArchivo(usuario);
+        String rutaAutor = uAutor != null ? uAutor.getRutaFoto() : null;
+        JPanel av = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (rutaAutor != null && !rutaAutor.isEmpty()) {
+                    try {
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(rutaAutor).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new Ellipse2D.Float(0, 0, 38, 38));
+                            g2.drawImage(img, 0, 0, 38, 38, this);
+                            g2.dispose();
+                            return;
+                        }
+                    } catch (Exception ex) { }
+                }
+                g2.setColor(avatarColor);
+                g2.fillOval(0, 0, 38, 38);
+                g2.dispose();
+            }
+        };
+        av.setOpaque(false);
         av.setBounds(12, 11, 38, 38);
         post.add(av);
 
@@ -337,23 +359,21 @@ public class Gui_Home {
         post.add(lblFechaHora);
 
         String rutaImg = p.getRutaImagen();
-        ImageIcon imagenCargada = null;
+        BufferedImage imagenCargada = null;
         if (rutaImg != null && !rutaImg.isEmpty()) {
             try {
-                ImageIcon original = new ImageIcon(rutaImg);
-                Image escalada = original.getImage().getScaledInstance(postAncho, imgH, Image.SCALE_SMOOTH);
-                imagenCargada = new ImageIcon(escalada);
+                imagenCargada = javax.imageio.ImageIO.read(new File(rutaImg).getAbsoluteFile());
             } catch (Exception ex) {
                 imagenCargada = null;
             }
         }
-        final ImageIcon imagenFinal = imagenCargada;
+        final BufferedImage imagenFinal = imagenCargada;
 
         JPanel imgPanel = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
                 if (imagenFinal != null) {
-                    g.drawImage(imagenFinal.getImage(), 0, 0, getWidth(), getHeight(), this);
+                    g.drawImage(imagenFinal, 0, 0, getWidth(), getHeight(), this);
                 } else {
                     g.setColor(avatarColor.darker());
                     g.fillRect(0, 0, getWidth(), getHeight());
@@ -418,6 +438,7 @@ public class Gui_Home {
                 p.reaccionar(usuarioActual);
                 likesCount[0]++;
             } else {
+                p.quitarLike(usuarioActual);
                 likesCount[0] = Math.max(0, likesCount[0] - 1);
             }
             lblLikes.setText(likesCount[0] + " likes");
@@ -462,8 +483,36 @@ public class Gui_Home {
             + "px; font-family:SansSerif; font-size:10pt'>"
             + "<b>" + usuario+":"+ "</b> " + caption
             + "</div></html>";
+        // Avatar del autor al lado del caption
+        Usuario uCaption = Usuario.cargarDesdeArchivo(usuario);
+        String rutaCaption = uCaption != null ? uCaption.getRutaFoto() : null;
+        JPanel avCaption = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (rutaCaption != null && !rutaCaption.isEmpty()) {
+                    try {
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(rutaCaption).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new Ellipse2D.Float(0, 0, 28, 28));
+                            g2.drawImage(img, 0, 0, 28, 28, this);
+                            g2.dispose();
+                            return;
+                        }
+                    } catch (Exception ex) { }
+                }
+                g2.setColor(avatarColor);
+                g2.fillOval(0, 0, 28, 28);
+                g2.dispose();
+            }
+        };
+        avCaption.setOpaque(false);
+        avCaption.setBounds(12, capY + 10, 28, 28);
+        post.add(avCaption);
+
         JLabel lblCaption = new JLabel(htmlCaption);
-        lblCaption.setBounds(12, capY, postAncho - 24, captionH);
+        lblCaption.setBounds(46, capY, postAncho - 58, captionH);
         post.add(lblCaption);
 
         return post;
@@ -472,23 +521,65 @@ public class Gui_Home {
     private void mostrarDialogoComentarios(Publicacion p, JLabel lblComs, int[] comsCount) {
         JDialog dlg = new JDialog(ventana, "Comentarios", true);
         dlg.setLayout(new BorderLayout());
-        dlg.setSize(400, 400);
+        dlg.setSize(700, 500);
         dlg.setLocationRelativeTo(ventana);
+
+        // Panel izquierdo — imagen del post
+        BufferedImage[] imgPost = {null};
+        String rutaImg = p.getRutaImagen();
+        if (rutaImg != null && !rutaImg.isEmpty()) {
+            try {
+                imgPost[0] = javax.imageio.ImageIO.read(new File(rutaImg).getAbsoluteFile());
+            } catch (Exception ex) { }
+        }
+
+        JPanel pnlImagen = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (imgPost[0] != null) {
+                    g.drawImage(imgPost[0], 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    g.setColor(BORDE);
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+        pnlImagen.setPreferredSize(new Dimension(280, 500));
+        dlg.add(pnlImagen, BorderLayout.WEST);
+
+        // Panel derecho — comentarios
+        JPanel pnlDerecho = new JPanel(new BorderLayout());
+        dlg.add(pnlDerecho, BorderLayout.CENTER);
 
         JPanel pnlLista = new JPanel();
         pnlLista.setLayout(new BoxLayout(pnlLista, BoxLayout.Y_AXIS));
         pnlLista.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
+        // Titulo del post al tope
+        pnlLista.add(crearFilaComentario(p.getAutor() + ": " + p.getContenido()));
+        pnlLista.add(Box.createVerticalStrut(8));
+
+        // Separador
+        JSeparator sep = new JSeparator();
+        sep.setForeground(BORDE);
+        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        pnlLista.add(sep);
+        pnlLista.add(Box.createVerticalStrut(8));
+
+        // Comentarios
         for (String com : p.getComentarios()) {
-            JLabel lbl = new JLabel(com);
-            lbl.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            pnlLista.add(lbl);
-            pnlLista.add(Box.createVerticalStrut(4));
+            pnlLista.add(crearFilaComentario(com));
+            pnlLista.add(Box.createVerticalStrut(6));
         }
 
         JScrollPane scroll = new JScrollPane(pnlLista);
-        dlg.add(scroll, BorderLayout.CENTER);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUnitIncrement(10);
+        pnlDerecho.add(scroll, BorderLayout.CENTER);
 
+        // Barra escribir comentario
         JPanel barraEscribir = new JPanel(new BorderLayout(6, 0));
         barraEscribir.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
         JTextField txtCom = new JTextField();
@@ -497,11 +588,10 @@ public class Gui_Home {
             String texto = txtCom.getText().trim();
             if (!texto.isEmpty()) {
                 p.comentar(usuarioActual, texto);
-                JLabel nuevo = new JLabel(usuarioActual + ": " + texto);
-                nuevo.setFont(new Font("SansSerif", Font.PLAIN, 12));
-                pnlLista.add(nuevo);
-                pnlLista.add(Box.createVerticalStrut(4));
+                pnlLista.add(crearFilaComentario(usuarioActual + ": " + texto));
+                pnlLista.add(Box.createVerticalStrut(6));
                 pnlLista.revalidate();
+                pnlLista.repaint();
                 txtCom.setText("");
                 comsCount[0]++;
                 lblComs.setText(comsCount[0] + " comentarios");
@@ -509,9 +599,62 @@ public class Gui_Home {
         });
         barraEscribir.add(txtCom, BorderLayout.CENTER);
         barraEscribir.add(btnEnviar, BorderLayout.EAST);
-        dlg.add(barraEscribir, BorderLayout.SOUTH);
+        pnlDerecho.add(barraEscribir, BorderLayout.SOUTH);
 
         dlg.setVisible(true);
+    }
+
+    private JPanel crearFilaComentario(String com) {
+        String username = com.contains(":") ? com.split(":")[0].trim() : "";
+
+        JPanel fila = new JPanel(new BorderLayout(8, 0));
+        fila.setOpaque(false);
+        fila.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
+
+        // Avatar
+        Usuario uCom = username.isEmpty() ? null : Usuario.cargarDesdeArchivo(username);
+        String rutaCom = uCom != null ? uCom.getRutaFoto() : null;
+        JPanel avatar = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (rutaCom != null && !rutaCom.isEmpty()) {
+                    try {
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(rutaCom).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new Ellipse2D.Float(0, 0, 32, 32));
+                            g2.drawImage(img, 0, 0, 32, 32, this);
+                            g2.dispose();
+                            return;
+                        }
+                    } catch (Exception ex) { }
+                }
+                g2.setColor(colorDeUsuario(username));
+                g2.fillOval(0, 0, 32, 32);
+                g2.dispose();
+            }
+        };
+        avatar.setOpaque(false);
+        avatar.setPreferredSize(new Dimension(32, 32));
+        avatar.setMinimumSize(new Dimension(32, 32));
+        avatar.setMaximumSize(new Dimension(32, 32));
+
+        // Texto con wrap
+        JTextArea txtArea = new JTextArea(com);
+        txtArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        txtArea.setForeground(TEXTO);
+        txtArea.setOpaque(false);
+        txtArea.setLineWrap(true);
+        txtArea.setWrapStyleWord(true);
+        txtArea.setEditable(false);
+        txtArea.setFocusable(false);
+        txtArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 8));
+
+        fila.add(avatar, BorderLayout.WEST);
+        fila.add(txtArea, BorderLayout.CENTER);
+        return fila;
     }
 
     private JPanel construirPanelDerecho() {
