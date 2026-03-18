@@ -42,6 +42,7 @@ public class Publicacion implements InteractuarUser {
         this.proporcion = proporcion;
         this.fecha = LocalDate.now().toString();
         this.hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         this.id = autorUsername + "_" + fecha + "_" + hora.replace(":", "");
     }
 
@@ -150,17 +151,21 @@ public class Publicacion implements InteractuarUser {
         String carpeta = GestorArchivos.RAIZ + autorUsername + "/publicaciones/";
         new File(carpeta).mkdirs();
 
-        // Copiar imagen a la carpeta del proyecto
         if (rutaImagen != null && !rutaImagen.isEmpty()) {
             try {
                 String ext = rutaImagen.substring(rutaImagen.lastIndexOf('.'));
                 String destino = carpeta + id + ext;
-                java.nio.file.Files.copy(
-                    java.nio.file.Paths.get(rutaImagen),
-                    java.nio.file.Paths.get(destino),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                );
-                rutaImagen = destino; // actualizar ruta a la local
+                File origen = new File(rutaImagen).getAbsoluteFile();
+                File dest   = new File(destino).getAbsoluteFile();
+                // Solo copiar si origen y destino son diferentes
+                if (!origen.getCanonicalPath().equals(dest.getCanonicalPath())) {
+                    java.nio.file.Files.copy(
+                        origen.toPath(),
+                        dest.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                    );
+                }
+                rutaImagen = destino;
             } catch (Exception ex) {
                 System.out.println("Error copiando imagen: " + ex.getMessage());
             }
@@ -179,38 +184,34 @@ public class Publicacion implements InteractuarUser {
         GestorArchivos.guardarPublicacionBinaria(autorUsername, id, datos);
     }
 
-    public static Publicacion cargar(String ruta) {
+   public static Publicacion cargar(String ruta) {
         String raw = GestorArchivos.leerPublicacionBinaria(ruta);
-        if (raw == null) {
-            return null;
-        }
+        if (raw == null) return null;
         Publicacion p = new Publicacion();
         for (String linea : raw.split("\n")) {
             if (linea.startsWith("id=")) {
-                p.id = linea.substring(3);
+                p.id = linea.substring(3).trim();
             } else if (linea.startsWith("autor=")) {
-                p.autorUsername = linea.substring(6);
+                p.autorUsername = linea.substring(6).trim();
             } else if (linea.startsWith("fecha=")) {
-                p.fecha = linea.substring(6);
+                p.fecha = linea.substring(6).trim();
             } else if (linea.startsWith("hora=")) {
-                p.hora = linea.substring(5);
+                p.hora = linea.substring(5).trim();
             } else if (linea.startsWith("contenido=")) {
-                p.contenido = linea.substring(10);
+                p.contenido = linea.substring(10).trim();
             } else if (linea.startsWith("hashtags=")) {
-                p.hashtags = linea.substring(9);
+                p.hashtags = linea.substring(9).trim();
             } else if (linea.startsWith("menciones=")) {
-                p.menciones = linea.substring(10);
+                p.menciones = linea.substring(10).trim();
             } else if (linea.startsWith("rutaImagen=")) {
                 p.rutaImagen = linea.substring(11).trim();
             } else if (linea.startsWith("tipoMultimedia=")) {
                 p.tipoMultimedia = TipoMultimedia.valueOf(linea.substring(15).trim());
             } else if (linea.startsWith("proporcion=")) {
-                p.proporcion = linea.substring(11);
+                p.proporcion = linea.substring(11).trim();
             }
         }
-        if (p.rutaImagen != null && p.rutaImagen.isEmpty()) {
-            p.rutaImagen = null;
-        }
+        if (p.rutaImagen != null && p.rutaImagen.isEmpty()) p.rutaImagen = null;
         return p;
     }
     

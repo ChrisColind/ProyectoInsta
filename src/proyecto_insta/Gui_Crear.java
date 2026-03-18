@@ -190,7 +190,20 @@ public class Gui_Crear {
                             g2.drawRoundRect(cx-11,cy-11,22,22,6,6);
                             g2.drawLine(cx,cy-6,cx,cy+6); g2.drawLine(cx-6,cy,cx+6,cy); break;
                         case 3:
-                            g2.drawRoundRect(cx-11,cy-9,22,17,5,5); g2.drawLine(cx-5,cy+8,cx-8,cy+12); break;
+                            g2.drawRoundRect(cx-11, cy-9, 22, 17, 5, 5);
+                            g2.drawLine(cx-5, cy+8, cx-8, cy+12);
+                            // Badge de mensajes no leidos
+                            int noLeidos = contarMensajesNoLeidos();
+                            if (noLeidos > 0) {
+                                String badge = noLeidos > 4 ? "4+" : String.valueOf(noLeidos);
+                                g2.setColor(new Color(237, 73, 86));
+                                g2.fillOval(cx + 4, cy - 14, 16, 16);
+                                g2.setColor(Color.WHITE);
+                                g2.setFont(new Font("SansSerif", Font.BOLD, 8));
+                                FontMetrics fmb = g2.getFontMetrics();
+                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge))/2, cy - 14 + 11);
+                            }
+                            break;
                         case 4:
                             g2.drawOval(cx-10,cy-10,20,20); g2.fillOval(cx-4,cy-6,8,8);
                             g2.drawArc(cx-8,cy+1,16,12,0,180); break;
@@ -220,6 +233,13 @@ public class Gui_Crear {
         side.add(lblFooter);
 
         return side;
+    }
+    private int contarMensajesNoLeidos() {
+        int total = 0;
+        for (String otro : Conversacion.getConversaciones(usuarioActual)) {
+            total += new Conversacion(usuarioActual, otro).getMensajesNoLeidos();
+        }
+        return total;
     }
 
     private JPanel construirAreaCrear() {

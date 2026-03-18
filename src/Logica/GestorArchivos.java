@@ -42,6 +42,7 @@ public class GestorArchivos {
         crearArchivo(base + "insta.ins");
         crearArchivo(base + "inbox.ins");
         crearArchivo(base + "stickers.ins");
+        crearArchivo(base + "solicitudes.ins");
     }
  
     public static boolean registrarUsername(String username) {
@@ -82,6 +83,16 @@ public class GestorArchivos {
         }
     }
  
+    public static void asignarFotoPredeterminada(String username) {
+        String rutaFoto = RAIZ + username + "/imagenes/perfil.jpg";
+        if (new File(rutaFoto).exists()) {
+            Usuario u = Usuario.cargarDesdeArchivo(username);
+            if (u != null && (u.getRutaFoto() == null || u.getRutaFoto().isEmpty())) {
+                u.setRutaFoto(rutaFoto);
+                u.guardar();
+            }
+        }
+    }
     // guarda una publicacion usando RandomAccessFile
     public static void guardarPublicacionBinaria(String username, String id, String datos) {
         String carpeta = RAIZ + username.toLowerCase() + "/publicaciones/";
@@ -122,10 +133,7 @@ public class GestorArchivos {
     }
  
     public static List<String> getStickersUsuario(String username) {
-        List<String> lista = getStickersPorDefecto();
-        for (String s : leerLineas(RAIZ + username + "/stickers.ins"))
-            if (!lista.contains(s)) lista.add(s);
-        return lista;
+        return leerLineas(RAIZ + username + "/stickers.ins");
     }
  
     public static void importarSticker(String username, String nombre) {

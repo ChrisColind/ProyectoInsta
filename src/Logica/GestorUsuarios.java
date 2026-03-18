@@ -32,19 +32,21 @@ public class GestorUsuarios {
     }
  
     public static void seguir(String yo, String otro) {
-        String base    = GestorArchivos.RAIZ;
+        String base = GestorArchivos.RAIZ;
         String myFollow = base + yo.toLowerCase() + "/following.ins";
         String hisFoll  = base + otro.toLowerCase() + "/followers.ins";
- 
+
         List<String> myList = GestorArchivos.leerLineas(myFollow);
         if (!myList.contains(otro.toLowerCase())) {
             GestorArchivos.escribirLinea(myFollow, otro.toLowerCase());
         }
- 
+
         List<String> hisList = GestorArchivos.leerLineas(hisFoll);
         if (!hisList.contains(yo.toLowerCase())) {
             GestorArchivos.escribirLinea(hisFoll, yo.toLowerCase());
         }
+
+        ServidorNotificaciones.getInstance().notificar("SEGUIDOR", otro.toLowerCase());
     }
  
     public static void dejarDeSeguir(String yo, String otro) {
@@ -59,6 +61,8 @@ public class GestorUsuarios {
         List<String> hisList = GestorArchivos.leerLineas(hisFoll);
         hisList.remove(yo.toLowerCase());
         GestorArchivos.sobreescribir(hisFoll, hisList);
+        ServidorNotificaciones.getInstance().notificar("SEGUIDOR", otro.toLowerCase());
+
     }
  
     public static boolean sigueA(String yo, String otro) {
@@ -82,7 +86,7 @@ public class GestorUsuarios {
         Usuario u = Usuario.cargarDesdeArchivo(otro);
         if (u == null || !u.esActivo()) return false;
         if (u.esPublico()) return true;
-        return sonAmigos(yo, otro);
+        return sigueA(yo, otro);
     }
  
     public static List<String> buscarPorCoincidencia(String texto) {

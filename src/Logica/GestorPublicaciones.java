@@ -19,19 +19,24 @@ public class GestorPublicaciones {
     public static List<Publicacion> getPublicacionesDeUsuario(String username) {
         return Publicacion.cargarTodasDeUsuario(username);
     }
- 
-    // devuelve publicaciones de los usuarios que sigo para el feed
+    
     public static List<Publicacion> getFeed(String username) {
-        List<Publicacion> feed = new ArrayList<>();
-        for (String seguido : GestorUsuarios.getFollowing(username)) {
-            if (GestorUsuarios.puedeVer(username, seguido))
-                feed.addAll(getPublicacionesDeUsuario(seguido));
-        }
-        feed.addAll(getPublicacionesDeUsuario(username));
-        return feed;
-    }
+       List<Publicacion> feed = new ArrayList<>();
+       for (String seguido : GestorUsuarios.getFollowing(username)) {
+           if (GestorUsuarios.puedeVer(username, seguido))
+               feed.addAll(getPublicacionesDeUsuario(seguido));
+       }
+       feed.addAll(getPublicacionesDeUsuario(username));
+
+       feed.sort((a, b) -> {
+           String fechaA = a.getFecha() + " " + a.getHora();
+           String fechaB = b.getFecha() + " " + b.getHora();
+           return fechaB.compareTo(fechaA);
+       });
+
+       return feed;
+   }
  
-    // busca en todas las publicaciones de todos los usuarios activos por hashtag
     public static List<Publicacion> buscarPorHashtag(String tag) {
         ListaPublicaciones todas = new ListaPublicaciones();
         for (String u : GestorArchivos.getTodosLosUsuarios()) {

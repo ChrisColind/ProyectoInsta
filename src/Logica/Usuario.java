@@ -115,7 +115,6 @@ public class Usuario extends EntidadBase {
         }
         return sigueA(otro.getUsername()) && otro.sigueA(this.username);
     }
-    
     public String getFechaCreacion() {
         return fechaCreacion;
     }

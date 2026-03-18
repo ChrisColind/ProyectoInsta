@@ -4,7 +4,6 @@
  */
 package proyecto_insta;
 
-
 /**
  *
  * @author croge
@@ -12,10 +11,10 @@ package proyecto_insta;
 public class Proyecto_Insta {
 
     /**
-     * @param args t    he command line arguments
+     * @param args t he command line arguments
      */
     public static void main(String[] args) {
-        Gui_Inicio abrir = new Gui_Inicio();  
+        Gui_Inicio abrir = new Gui_Inicio();
         abrir.ventana.setVisible(true);
     }
     

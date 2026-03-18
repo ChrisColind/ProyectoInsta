@@ -11,6 +11,7 @@ import PEnums.Enums.TipoMultimedia;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.io.File;
 import javax.swing.*;
 
 /**
@@ -74,7 +75,6 @@ public class Gui_Inicio {
         pnlCards.setBounds(0, 0, W, H);
 
         GestorArchivos.inicializar();
-        IniciarCuentasPredeter();
 
         pnlCards.add(construirPantallaLogin(), "login");
         Gui_Registro guiReg = new Gui_Registro(ventana, cardLayout, pnlCards);
@@ -86,62 +86,6 @@ public class Gui_Inicio {
         ventana.setContentPane(panelRaiz);
         ventana.setVisible(true);
     }
-
-    private void IniciarCuentasPredeter() {
-        crearCuentaConPublicaciones(
-            "razer_hn", "Razer Honduras", "M", "razer123", 5, "Publica",
-            new String[]{
-                "Nueva llegada: Razer BlackWidow V4 Pro. El teclado mecanico definitivo para gaming. #razer #gaming #teclado",
-                "Headset Razer BlackShark V2 ahora disponible. Sonido surround 7.1 para dominar cada partida. #razer #headset #gaming",
-                "Mouse Razer DeathAdder V3 en stock. Sensor Focus Pro 30K para precision maxima. #razer #mouse #perifericos",
-                "Silla Razer Iskur disponible en tienda. Ergonomia y estilo gamer en un solo producto. #razer #silla #setup"
-            }
-        );
-
-        crearCuentaConPublicaciones(
-            "espnfc_hn", "ESPN FC Honduras", "M", "espnfc123", 8, "Publica",
-            new String[]{
-                "Real Madrid golea 4-0 al Barcelona en el Clasico. Vinicius Jr anota doblete en el Bernabeu. #futbol #clasico #realmadrid",
-                "Manchester City clasificado a semifinales de Champions League tras vencer al Bayern Munich. #champions #mancity",
-                "Lionel Messi convierte desde el punto penal y Argentina avanza en las eliminatorias. #messi #argentina #eliminatorias",
-                "Cristiano Ronaldo rompe otro record: 900 goles en su carrera profesional. #cristiano #record #futbol"
-            }
-        );
-
-        crearCuentaConPublicaciones(
-            "memes_hn", "Memes Honduras", "M", "memes123", 3, "Publica",
-            new String[]{
-                "Cuando el profesor dice que el examen sera facil y llega con 50 preguntas de desarrollo. #memes #universidad #examen",
-                "Yo a las 11pm: voy a dormir temprano. Yo a las 3am: #memes #vida #noche",
-                "El cafe de las 6am vs el cafe de las 6pm. Uno te despierta, el otro te despierta a las 3am. #memes #cafe #humor",
-                "Cuando llegas tarde al trabajo y el jefe ya te estaba esperando en la puerta. #memes #trabajo #lunes"
-            }
-        );
-
-        crearCuentaConPublicaciones(
-            "titanfit_hn", "Titan Fitness HN", "M", "titanfit123", 6, "Publica",
-            new String[]{
-                "Nueva zona de pesas libres disponible. 500 metros cuadrados de equipos de ultima generacion. #gym #fitness #titanfit",
-                "Clases de spinning todos los dias a las 6am y 7pm. Cupo limitado, reserva ya tu lugar. #spinning #cardio #fitness",
-                "Proteina ON Gold Standard al mejor precio del mercado. Disponible en recepcion. #proteina #suplementos #gym",
-                "Rutina de pecho y triceps para principiantes. Consulta con nuestros entrenadores certificados. #rutina #gym #entrenamiento"
-            }
-        );
-    }
-
-    private void crearCuentaConPublicaciones(String username, String nombre, String genero,
-            String password, int edad, String tipoCuenta, String[] contenidos) {
-        if (GestorArchivos.usuarioExiste(username)) return;
-
-        GestorUsuarios.registrar(username, nombre, genero, password, edad, tipoCuenta, null);
-
-        for (String contenido : contenidos) {
-            Publicacion p = new Publicacion(username, contenido, extraerHashtags(contenido),
-                "", null, TipoMultimedia.NINGUNO, "Cuadrada");
-            p.guardar();
-        }
-    }
-
     private String extraerHashtags(String texto) {
         StringBuilder tags = new StringBuilder();
         for (String palabra : texto.split(" ")) {
@@ -405,6 +349,7 @@ public class Gui_Inicio {
     }
 
     public void accionLogin() {
+        ServidorNotificaciones.getInstance().iniciar();
         String usuario = txtUsuario.getText().trim();
         String contra  = String.valueOf(txtContra.getPassword());
 
@@ -426,7 +371,7 @@ public class Gui_Inicio {
             return;
         }
 
-        usuarioActual = usuario;
+        usuarioActual = usuario.toLowerCase();
         lblExcepcion.setText(" ");
         txtUsuario.setText("Usuario");
         txtUsuario.setForeground(C_GRIS);

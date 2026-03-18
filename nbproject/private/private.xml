@@ -3,27 +3,36 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Proyecto_Insta.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Interfaces/InteractuarUser.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Interfaces/GestionUser.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/PEnums/Enums.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Inicio.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Navegador.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Home.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Crear.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/Publicacion.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Perfil.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Buscar.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Chats.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/proyecto_insta/Gui_Registro.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/GestorArchivos.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/Nodo.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/MensajeSticker.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/ListaPublicaciones.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/ListaMensajes.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/ListaFollowers.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/GestorUsuarios.java</file>
-            <file>file:/C:/Users/croge/Documents/NetBeansProjects/Proyecto_Insta/src/Logica/Usuario.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Inicio.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/MensajeTexto.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Registro.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Absrtact/Mensaje.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Navegador.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Chats.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/GestorArchivos.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/GestorInbox.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/GestorPublicaciones.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/ListaMensajes.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/PEnums/Enums.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/Buscador.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/EntidadBase.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Interfaces/GestionUser.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Interfaces/InteractuarUser.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Perfil.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/Timeline.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/Usuario.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/MensajeSticker.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/GestorUsuarios.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/Publicacion.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Crear.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Buscar.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/ListaFollowers.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Absrtact/CuentaBase.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Proyecto_Insta.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/ListaPublicaciones.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/Nodo.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/proyecto_insta/Gui_Home.java</file>
+            <file>file:/C:/Users/Rogelio/Desktop/Proyecto%20Insta/ProyectoInsta/src/Logica/Conversacion.java</file>
         </group>
     </open-files>
 </project-private>

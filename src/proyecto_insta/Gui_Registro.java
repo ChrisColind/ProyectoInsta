@@ -342,13 +342,35 @@ public class Gui_Registro {
         nuevo.guardar();
         GestorArchivos.registrarUsername(username);
 
+        String[] predeter = {"bershkahn", "noticiasfb", "razerhn"};
+        for (String cuenta : predeter) {
+            if (GestorArchivos.usuarioExiste(cuenta)) {
+                GestorUsuarios.seguir(username.toLowerCase(), cuenta);
+            }
+        }
+
         lblError.setForeground(VERDE);
         lblError.setText("Cuenta creada exitosamente!");
 
         Timer esperar = new Timer(1200, ev -> {
             lblError.setForeground(ROJO);
             limpiar(btnReg, btnM, btnF, btnPub, btnPriv);
-            cardLayout.show(pnlCards, "login");
+
+            // Iniciar sesion automaticamente
+            String usernameActual = username.toLowerCase();
+            Gui_Navegador nav = new Gui_Navegador(cardLayout, pnlCards);
+            nav.setContexto(ventana, usernameActual);
+            Gui_Home   guiHome   = new Gui_Home(ventana, nav, usernameActual);
+            Gui_Buscar guiBuscar = new Gui_Buscar(ventana, nav, usernameActual);
+            Gui_Chats  guiChats  = new Gui_Chats(ventana, nav, usernameActual);
+            Gui_Crear  guiCrear  = new Gui_Crear(ventana, nav, usernameActual);
+            Gui_Perfil guiPerfil = new Gui_Perfil(ventana, nav, usernameActual, usernameActual);
+            pnlCards.add(guiHome.construirPantalla(),   "home");
+            pnlCards.add(guiBuscar.construirPantalla(), "buscar");
+            pnlCards.add(guiChats.construirPantalla(),  "chats");
+            pnlCards.add(guiCrear.construirPantalla(),  "crear");
+            pnlCards.add(guiPerfil.construirPantalla(), "perfil");
+            cardLayout.show(pnlCards, "home");
         });
         esperar.setRepeats(false);
         esperar.start();

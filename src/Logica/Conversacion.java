@@ -25,6 +25,7 @@ public class Conversacion {
     public void enviar(Mensaje m) {
         GestorArchivos.escribirLinea(rutaInbox, m.serializar());
         GestorArchivos.escribirLinea(GestorArchivos.RAIZ + usuarioB + "/inbox.ins", m.serializar());
+        ServidorNotificaciones.getInstance().notificar("MENSAJE", usuarioB);
     }
  
     public List<Mensaje> getMensajes() {

@@ -70,6 +70,9 @@ public abstract class EntidadBase {
     public void setEstado(EstadoCuenta nuevoEstado) {
         this.estado = nuevoEstado;
     }
+    public void setTipoCuenta(String tipo) {
+        this.tipoCuenta = tipo.equalsIgnoreCase("Publica") ? TipoCuenta.PUBLICA : TipoCuenta.PRIVADA;
+    }
 
     public boolean verificarPassword(String pass) {
         return this.password.equals(pass);

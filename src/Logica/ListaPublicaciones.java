@@ -83,4 +83,17 @@ public class ListaPublicaciones {
     public int getTamaño() { 
         return tamaño; 
     }
+    public List<Publicacion> buscarPorMencion(String username) {
+        return buscarMencionRecursivo(cabeza, username.toLowerCase(), new ArrayList<>(), new ArrayList<>());
+    }
+
+    private List<Publicacion> buscarMencionRecursivo(Nodo<Publicacion> nodo, String username,
+            List<Publicacion> resultado, List<String> idsVistos) {
+        if (nodo == null) return resultado;
+        if (nodo.dato.mencionaA(username) && !idsVistos.contains(nodo.dato.getId())) {
+            idsVistos.add(nodo.dato.getId());
+            resultado.add(nodo.dato);
+        }
+        return buscarMencionRecursivo(nodo.siguiente, username, resultado, idsVistos);
+    }
 }

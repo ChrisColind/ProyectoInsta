@@ -16,7 +16,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-
+import Logica.Nodo;
 /**
  *
  * @author Rogelio
@@ -199,6 +199,17 @@ public class Gui_Buscar {
                         case 3:
                             g2.drawRoundRect(cx-11, cy-9, 22, 17, 5, 5);
                             g2.drawLine(cx-5, cy+8, cx-8, cy+12);
+                            // Badge de mensajes no leidos
+                            int noLeidos = contarMensajesNoLeidos();
+                            if (noLeidos > 0) {
+                                String badge = noLeidos > 4 ? "4+" : String.valueOf(noLeidos);
+                                g2.setColor(new Color(237, 73, 86));
+                                g2.fillOval(cx + 4, cy - 14, 16, 16);
+                                g2.setColor(Color.WHITE);
+                                g2.setFont(new Font("SansSerif", Font.BOLD, 8));
+                                FontMetrics fmb = g2.getFontMetrics();
+                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge))/2, cy - 14 + 11);
+                            }
                             break;
                         case 4:
                             g2.drawOval(cx-10, cy-10, 20, 20);
@@ -233,7 +244,13 @@ public class Gui_Buscar {
         side.add(lblFooter);
         return side;
     }
-
+    private int contarMensajesNoLeidos() {
+        int total = 0;
+        for (String otro : Conversacion.getConversaciones(usuarioActual)) {
+            total += new Conversacion(usuarioActual, otro).getMensajesNoLeidos();
+        }
+        return total;
+    }
     private JPanel construirAreaBusqueda() {
         int areaX = SIDEBAR_W;
         int areaW = W - SIDEBAR_W;
@@ -280,21 +297,9 @@ public class Gui_Buscar {
         area.setComponentZOrder(lblPlaceholder, 0);
 
         txtBuscar.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                lblPlaceholder.setVisible(false);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                lblPlaceholder.setVisible(txtBuscar.getText().isEmpty());
-            }
+            @Override public void focusGained(FocusEvent e) { lblPlaceholder.setVisible(false); }
+            @Override public void focusLost(FocusEvent e)   { lblPlaceholder.setVisible(txtBuscar.getText().isEmpty()); }
         });
-
-        lblRecientes = new JLabel("Recientes");
-        lblRecientes.setFont(new Font("SansSerif", Font.BOLD, 15));
-        lblRecientes.setForeground(TEXTO);
-        lblRecientes.setBounds(campX, 86, 200, 26);
-        area.add(lblRecientes);
 
         lblSinResultados = new JLabel("");
         lblSinResultados.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -313,22 +318,23 @@ public class Gui_Buscar {
         scrollResultados.setBounds(campX - 10, 118, campW + 20, H - TOPBAR_H - 130);
         area.add(scrollResultados);
 
-        cargarRecientes(campW);
-
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
             void actualizar() {
                 String texto = txtBuscar.getText().trim();
                 if (texto.isEmpty()) {
-                    lblRecientes.setVisible(true);
                     lblSinResultados.setVisible(false);
-                    cargarRecientes(campW);
+                    pnlResultados.removeAll();
+                    pnlResultados.revalidate();
+                    pnlResultados.repaint();
                 } else if (texto.startsWith("#")) {
-                    lblRecientes.setVisible(false);
                     lblSinResultados.setVisible(true);
                     lblSinResultados.setText("Resultados para " + texto);
                     buscarHashtag(texto, campW);
-                } else {
-                    lblRecientes.setVisible(false);
+                }else if (texto.startsWith("@")) {
+                    lblSinResultados.setVisible(true);
+                    lblSinResultados.setText("Publicaciones donde mencionan " + texto);
+                    buscarMenciones(texto, campW);
+                }else {
                     lblSinResultados.setVisible(true);
                     lblSinResultados.setText("Resultados para \"" + texto + "\"");
                     buscarUsuarios(texto, campW);
@@ -341,26 +347,41 @@ public class Gui_Buscar {
 
         return area;
     }
-
-    private void cargarRecientes(int campW) {
+    private void buscarMenciones(String tag, int campW) {
         pnlResultados.removeAll();
-        Usuario yo = Usuario.cargarDesdeArchivo(usuarioActual);
-        List<String> recientes = yo != null ? yo.getFollowing() : new java.util.ArrayList<>();
-        if (recientes.isEmpty()) {
-            JLabel lbl = new JLabel("No sigues a nadie aun.");
+        pnlResultados.setLayout(new GridBuscar(FlowLayout.LEFT, 4, 4));
+
+        ListaPublicaciones lista = new ListaPublicaciones();
+        for (String username : GestorArchivos.getTodosLosUsuarios()) {
+            Usuario u = Usuario.cargarDesdeArchivo(username);
+            if (u == null || !u.esActivo()) continue;
+            for (Publicacion p : GestorPublicaciones.getPublicacionesDeUsuario(username)) {
+                lista.agregar(p);
+            }
+        }
+
+        List<Publicacion> pubs = lista.buscarPorMencion(tag.replace("@", ""));
+
+        if (pubs.isEmpty()) {
+            pnlResultados.setLayout(new BoxLayout(pnlResultados, BoxLayout.Y_AXIS));
+            JLabel lbl = new JLabel("Sin publicaciones que mencionen " + tag);
             lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
             lbl.setForeground(GRIS);
             lbl.setBorder(BorderFactory.createEmptyBorder(10, 4, 0, 0));
             pnlResultados.add(lbl);
-        }
-        for (String u : recientes) {
-            Usuario usr = Usuario.cargarDesdeArchivo(u);
-            if (usr != null) pnlResultados.add(crearFilaUsuario(usr, campW));
+        } else {
+            for (Publicacion p : pubs) {
+                pnlResultados.add(crearCeldaHashtag(p));
+            }
         }
         pnlResultados.revalidate();
         pnlResultados.repaint();
+        for (Publicacion p : pubs) {
+    System.out.println("MENCION encontrada: " + p.getId() + " | menciones: " + p.getMenciones());
+}
     }
 
+    
     private void buscarUsuarios(String texto, int campW) {
         pnlResultados.removeAll();
         List<String> resultados = GestorUsuarios.buscarPorCoincidencia(texto);
@@ -374,7 +395,7 @@ public class Gui_Buscar {
         }
         for (String u : resultados) {
             Usuario usr = Usuario.cargarDesdeArchivo(u);
-            if (usr != null) pnlResultados.add(crearFilaUsuario(usr, campW));
+            if (usr != null) pnlResultados.add(crearFila(usr, campW));
         }
         pnlResultados.revalidate();
         pnlResultados.repaint();
@@ -382,20 +403,149 @@ public class Gui_Buscar {
 
     private void buscarHashtag(String tag, int campW) {
         pnlResultados.removeAll();
+        pnlResultados.setLayout(new GridBuscar(FlowLayout.LEFT, 4, 4));
+
         ListaPublicaciones lista = new ListaPublicaciones();
+        for (String username : GestorArchivos.getTodosLosUsuarios()) {
+            Usuario u = Usuario.cargarDesdeArchivo(username);
+            if (u == null || !u.esActivo()) continue;
+            for (Publicacion p : GestorPublicaciones.getPublicacionesDeUsuario(username)) {
+                lista.agregar(p);
+            }
+        }
+
         List<Publicacion> pubs = lista.buscarPorHashtag(tag);
+
         if (pubs.isEmpty()) {
+            pnlResultados.setLayout(new BoxLayout(pnlResultados, BoxLayout.Y_AXIS));
             JLabel lbl = new JLabel("Sin publicaciones con " + tag);
             lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
             lbl.setForeground(GRIS);
             lbl.setBorder(BorderFactory.createEmptyBorder(10, 4, 0, 0));
             pnlResultados.add(lbl);
-        }
-        for (Publicacion p : pubs) {
-            pnlResultados.add(crearFilaPublicacion(p, campW));
+        } else {
+            for (Publicacion p : pubs) {
+                pnlResultados.add(crearCeldaHashtag(p));
+            }
         }
         pnlResultados.revalidate();
         pnlResultados.repaint();
+    }
+    
+    private JPanel crearCeldaHashtag(Publicacion p) {
+        int size = 180;
+
+        BufferedImage[] imgCache = {null};
+        String ruta = p.getRutaImagen();
+        if (ruta != null && !ruta.isEmpty()) {
+            try {
+                imgCache[0] = javax.imageio.ImageIO.read(new File(ruta).getAbsoluteFile());
+            } catch (Exception ex) { }
+        }
+
+        JPanel celda = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (imgCache[0] != null) {
+                    g.drawImage(imgCache[0], 0, 0, size, size, this);
+                } else {
+                    g.setColor(colorDeUsuario(p.getAutor()).darker());
+                    g.fillRect(0, 0, size, size);
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    int cx = size / 2, cy = size / 2;
+                    g2.setColor(new Color(255, 255, 255, 80));
+                    g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawRoundRect(cx - 16, cy - 10, 32, 22, 6, 6);
+                    g2.drawOval(cx - 7, cy - 7, 14, 14);
+                    g2.dispose();
+                }
+            }
+        };
+        celda.setPreferredSize(new Dimension(size, size));
+        celda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        celda.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                abrirPerfilConPublicacion(p);
+            }
+        });
+        return celda;
+    }
+    
+    private JPanel crearFila(Object item, int campW) {
+        if (item instanceof Usuario) return crearFilaUsuario((Usuario) item, campW);
+        if (item instanceof Publicacion) return crearFilaPublicacion((Publicacion) item, campW);
+        return new JPanel();
+    }
+    
+    private JPanel crearFilaPublicacion(Publicacion p, int campW) {
+        JPanel fila = new JPanel(null);
+        fila.setOpaque(false);
+        fila.setMaximumSize(new Dimension(campW + 20, 60));
+        fila.setPreferredSize(new Dimension(campW + 20, 60));
+
+        Usuario uAutor = Usuario.cargarDesdeArchivo(p.getAutor());
+        String rutaAutor = uAutor != null ? uAutor.getRutaFoto() : null;
+        JPanel av = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (rutaAutor != null && !rutaAutor.isEmpty()) {
+                    try {
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(rutaAutor).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new Ellipse2D.Float(0, 0, 38, 38));
+                            g2.drawImage(img, 0, 0, 38, 38, this);
+                            g2.dispose();
+                            return;
+                        }
+                    } catch (Exception ex) { }
+                }
+                g2.setColor(colorDeUsuario(p.getAutor()));
+                g2.fillOval(0, 0, 38, 38);
+                g2.dispose();
+            }
+        };
+        av.setOpaque(false);
+        av.setBounds(4, 11, 38, 38);
+        fila.add(av);
+
+        JLabel lAutor = new JLabel("@" + p.getAutor());
+        lAutor.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lAutor.setForeground(TEXTO);
+        lAutor.setBounds(52, 10, 200, 15);
+        fila.add(lAutor);
+
+        String preview = p.getContenido().length() > 60
+            ? p.getContenido().substring(0, 60) + "..." : p.getContenido();
+        JLabel lContenido = new JLabel(preview);
+        lContenido.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        lContenido.setForeground(GRIS);
+        lContenido.setBounds(52, 27, campW - 60, 14);
+        fila.add(lContenido);
+
+        JLabel lFecha = new JLabel(p.getFecha() + " " + p.getHora());
+        lFecha.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        lFecha.setForeground(GRIS);
+        lFecha.setBounds(52, 43, 200, 12);
+        fila.add(lFecha);
+
+        JSeparator sep = new JSeparator();
+        sep.setForeground(BORDE);
+        sep.setBounds(0, 58, campW + 20, 1);
+        fila.add(sep);
+
+        return fila;
+    }
+    
+    private void abrirPerfilConPublicacion(Publicacion p) {
+        String key = "perfil_" + p.getAutor();
+        Gui_Perfil guiPerfil = new Gui_Perfil(ventana, nav, usuarioActual, p.getAutor());
+        nav.getPnlCards().add(guiPerfil.construirPantalla(), key);
+        nav.ir(key);
+        SwingUtilities.invokeLater(() -> guiPerfil.abrirPublicacion(p));
     }
 
     private JPanel crearFilaUsuario(Usuario u, int campW) {
@@ -405,7 +555,30 @@ public class Gui_Buscar {
         fila.setPreferredSize(new Dimension(campW + 20, 56));
         fila.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        JPanel av = crearAvatar(38, colorDeUsuario(u.getUsername()));
+        // Avatar con foto de perfil
+        String rutaU = u.getRutaFoto();
+        JPanel av = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (rutaU != null && !rutaU.isEmpty()) {
+                    try {
+                        BufferedImage img = javax.imageio.ImageIO.read(new File(rutaU).getAbsoluteFile());
+                        if (img != null) {
+                            g2.setClip(new Ellipse2D.Float(0, 0, 38, 38));
+                            g2.drawImage(img, 0, 0, 38, 38, this);
+                            g2.dispose();
+                            return;
+                        }
+                    } catch (Exception ex) { }
+                }
+                g2.setColor(colorDeUsuario(u.getUsername()));
+                g2.fillOval(0, 0, 38, 38);
+                g2.dispose();
+            }
+        };
+        av.setOpaque(false);
         av.setBounds(4, 9, 38, 38);
         fila.add(av);
 
@@ -464,51 +637,12 @@ public class Gui_Buscar {
 
         fila.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                abrirPerfil(u.getUsername());
-            }
+            public void mouseClicked(MouseEvent e) { abrirPerfil(u.getUsername()); }
         });
 
         JSeparator sep = new JSeparator();
         sep.setForeground(BORDE);
         sep.setBounds(0, 54, campW + 20, 1);
-        fila.add(sep);
-
-        return fila;
-    }
-
-    private JPanel crearFilaPublicacion(Publicacion p, int campW) {
-        JPanel fila = new JPanel(null);
-        fila.setOpaque(false);
-        fila.setMaximumSize(new Dimension(campW + 20, 60));
-        fila.setPreferredSize(new Dimension(campW + 20, 60));
-
-        JPanel av = crearAvatar(38, colorDeUsuario(p.getAutor()));
-        av.setBounds(4, 11, 38, 38);
-        fila.add(av);
-
-        JLabel lAutor = new JLabel("@" + p.getAutor());
-        lAutor.setFont(new Font("SansSerif", Font.BOLD, 12));
-        lAutor.setForeground(TEXTO);
-        lAutor.setBounds(52, 10, 200, 15);
-        fila.add(lAutor);
-
-        String preview = p.getContenido().length() > 60 ? p.getContenido().substring(0, 60) + "..." : p.getContenido();
-        JLabel lContenido = new JLabel(preview);
-        lContenido.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        lContenido.setForeground(GRIS);
-        lContenido.setBounds(52, 27, campW - 60, 14);
-        fila.add(lContenido);
-
-        JLabel lFecha = new JLabel(p.getFecha() + " " + p.getHora());
-        lFecha.setFont(new Font("SansSerif", Font.PLAIN, 10));
-        lFecha.setForeground(GRIS);
-        lFecha.setBounds(52, 43, 200, 12);
-        fila.add(lFecha);
-
-        JSeparator sep = new JSeparator();
-        sep.setForeground(BORDE);
-        sep.setBounds(0, 58, campW + 20, 1);
         fila.add(sep);
 
         return fila;
@@ -523,24 +657,6 @@ public class Gui_Buscar {
 
     private Color colorDeUsuario(String username) { return new Color(180, 180, 180); }
 
-    private JPanel crearAvatar(int size, Color color) {
-        JPanel p = new JPanel(null) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.fillOval(0, 0, size, size);
-                g2.dispose();
-            }
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(size, size);
-            }
-        };
-        p.setOpaque(false);
-        return p;
-    }
 
     private static class RoundedBorder implements Border {
         private final int radius;
@@ -566,6 +682,51 @@ public class Gui_Buscar {
             g2.setColor(BORDE);
             g2.drawRoundRect(x, y, w-1, h-1, radius, radius);
             g2.dispose();
+        }
+    }
+    
+    private static class GridBuscar extends FlowLayout {
+    GridBuscar(int align, int hgap, int vgap) {
+        super(align, hgap, vgap);
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container target) {
+        return layoutSize(target, true);
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container target) {
+        return layoutSize(target, false);
+    }
+
+    private Dimension layoutSize(Container target, boolean preferred) {
+            synchronized (target.getTreeLock()) {
+                int targetWidth = target.getSize().width;
+                if (targetWidth == 0) targetWidth = Integer.MAX_VALUE;
+                int hgap = getHgap(), vgap = getVgap();
+                Insets insets = target.getInsets();
+                int maxWidth = targetWidth - (insets.left + insets.right + hgap * 2);
+                Dimension dim = new Dimension(0, 0);
+                int rowWidth = 0, rowHeight = 0;
+                for (int i = 0; i < target.getComponentCount(); i++) {
+                    Component m = target.getComponent(i);
+                    if (m.isVisible()) {
+                        Dimension d = preferred ? m.getPreferredSize() : m.getMinimumSize();
+                        if (rowWidth + d.width > maxWidth) {
+                            dim.width = Math.max(dim.width, rowWidth);
+                            dim.height += rowHeight + vgap;
+                            rowWidth = 0;
+                            rowHeight = 0;
+                        }
+                        rowWidth += d.width + hgap;
+                        rowHeight = Math.max(rowHeight, d.height);
+                    }
+                }
+                dim.width = Math.max(dim.width, rowWidth);
+                dim.height += rowHeight + insets.top + insets.bottom + vgap * 2;
+                return dim;
+            }
         }
     }
 }

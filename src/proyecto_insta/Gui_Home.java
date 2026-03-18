@@ -196,6 +196,17 @@ public class Gui_Home {
                         case 3:
                             g2.drawRoundRect(cx-11, cy-9, 22, 17, 5, 5);
                             g2.drawLine(cx-5, cy+8, cx-8, cy+12);
+                            // Badge de mensajes no leidos
+                            int noLeidos = contarMensajesNoLeidos();
+                            if (noLeidos > 0) {
+                                String badge = noLeidos > 4 ? "4+" : String.valueOf(noLeidos);
+                                g2.setColor(new Color(237, 73, 86));
+                                g2.fillOval(cx + 4, cy - 14, 16, 16);
+                                g2.setColor(Color.WHITE);
+                                g2.setFont(new Font("SansSerif", Font.BOLD, 8));
+                                FontMetrics fmb = g2.getFontMetrics();
+                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge))/2, cy - 14 + 11);
+                            }
                             break;
                         case 4:
                             g2.drawOval(cx-10, cy-10, 20, 20);
@@ -230,7 +241,13 @@ public class Gui_Home {
         side.add(lblFooter);
         return side;
     }
-
+    private int contarMensajesNoLeidos() {
+        int total = 0;
+        for (String otro : Conversacion.getConversaciones(usuarioActual)) {
+            total += new Conversacion(usuarioActual, otro).getMensajesNoLeidos();
+        }
+        return total;
+    }
     private JScrollPane construirFeed() {
         JPanel feed = new JPanel();
         feed.setLayout(new BoxLayout(feed, BoxLayout.Y_AXIS));
@@ -241,17 +258,8 @@ public class Gui_Home {
 
         List<Publicacion> publicaciones = new Timeline(usuarioActual).getFeed();
 
-        // siempre se muestran las cuentas predeterminadas sin importar si las sigue
-        String[] cuentasPredeter = {"razer_hn", "espnfc_hn", "memes_hn", "titanfit_hn"};
         Set<String> idsEnFeed = new java.util.HashSet<>();
         for (Publicacion p : publicaciones) idsEnFeed.add(p.getId());
-
-        for (String cuenta : cuentasPredeter) {
-            if (cuenta.equalsIgnoreCase(usuarioActual)) continue;
-            for (Publicacion p : GestorPublicaciones.getPublicacionesDeUsuario(cuenta)) {
-                if (idsEnFeed.add(p.getId())) publicaciones.add(p);
-            }
-        }
 
         if (publicaciones.isEmpty()) {
             JLabel lblVacio = new JLabel("No hay publicaciones aun.");
@@ -314,7 +322,7 @@ public class Gui_Home {
         post.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         Usuario uAutor = Usuario.cargarDesdeArchivo(usuario);
-        String rutaAutor = uAutor != null ? uAutor.getRutaFoto() : null;
+        String rutaAutor = uAutor != null ? uAutor.getRutaFoto() : null; 
         JPanel av = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -479,9 +487,10 @@ public class Gui_Home {
         post.add(btnCom);
 
         int capY = ay + 30;
+        String hashtags = p.getHashtags() != null && !p.getHashtags().isEmpty() ? " <font color='#0095F6'>" + p.getHashtags() + "</font>" : "";
         String htmlCaption = "<html><div style='width:" + (postAncho - 28)
             + "px; font-family:SansSerif; font-size:10pt'>"
-            + "<b>" + usuario+":"+ "</b> " + caption
+            + "<b>" + usuario + ":</b> " + caption + hashtags
             + "</div></html>";
         // Avatar del autor al lado del caption
         Usuario uCaption = Usuario.cargarDesdeArchivo(usuario);
@@ -556,21 +565,34 @@ public class Gui_Home {
         pnlLista.setLayout(new BoxLayout(pnlLista, BoxLayout.Y_AXIS));
         pnlLista.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        // Titulo del post al tope
-        pnlLista.add(crearFilaComentario(p.getAutor() + ": " + p.getContenido()));
-        pnlLista.add(Box.createVerticalStrut(8));
+        String hashtagsTitulo = p.getHashtags() != null && !p.getHashtags().isEmpty()
+            ? " " + p.getHashtags() : "";
+        JPanel panelTitulo = new JPanel();
+        panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
+        panelTitulo.setOpaque(false);
+        panelTitulo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Separador
+        panelTitulo.add(crearFilaComentario(p.getAutor() + ": " + p.getContenido() + hashtagsTitulo));
+
+        if (p.getMenciones() != null && !p.getMenciones().isEmpty()) {
+            JLabel lblMenciones = new JLabel("<html><div style='width:270px'>" + p.getMenciones() + "</div></html>");
+            lblMenciones.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            lblMenciones.setForeground(AZUL);
+            lblMenciones.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
+            lblMenciones.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panelTitulo.add(lblMenciones);
+        }
+
+        pnlLista.add(panelTitulo);
+
         JSeparator sep = new JSeparator();
         sep.setForeground(BORDE);
         sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         pnlLista.add(sep);
-        pnlLista.add(Box.createVerticalStrut(8));
+        pnlLista.add(Box.createVerticalStrut(4));
 
-        // Comentarios
         for (String com : p.getComentarios()) {
             pnlLista.add(crearFilaComentario(com));
-            pnlLista.add(Box.createVerticalStrut(6));
         }
 
         JScrollPane scroll = new JScrollPane(pnlLista);
@@ -610,9 +632,7 @@ public class Gui_Home {
         JPanel fila = new JPanel(new BorderLayout(8, 0));
         fila.setOpaque(false);
         fila.setAlignmentX(Component.LEFT_ALIGNMENT);
-        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
 
-        // Avatar
         Usuario uCom = username.isEmpty() ? null : Usuario.cargarDesdeArchivo(username);
         String rutaCom = uCom != null ? uCom.getRutaFoto() : null;
         JPanel avatar = new JPanel(null) {
@@ -639,9 +659,9 @@ public class Gui_Home {
         avatar.setOpaque(false);
         avatar.setPreferredSize(new Dimension(32, 32));
         avatar.setMinimumSize(new Dimension(32, 32));
-        avatar.setMaximumSize(new Dimension(32, 32));
+        avatar.setMaximumSize(new Dimension(32, Integer.MAX_VALUE));
 
-        // Texto con wrap
+        // Calcular altura real del texto
         JTextArea txtArea = new JTextArea(com);
         txtArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
         txtArea.setForeground(TEXTO);
@@ -651,7 +671,11 @@ public class Gui_Home {
         txtArea.setEditable(false);
         txtArea.setFocusable(false);
         txtArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 8));
+        txtArea.setSize(new Dimension(330, Short.MAX_VALUE));
+        int alturaReal = Math.max(36, txtArea.getPreferredSize().height);
+        txtArea.setPreferredSize(new Dimension(330, alturaReal));
 
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, alturaReal + 0));
         fila.add(avatar, BorderLayout.WEST);
         fila.add(txtArea, BorderLayout.CENTER);
         return fila;
@@ -684,19 +708,6 @@ public class Gui_Home {
 
         for (int i = 0; i < max; i++) {
             final String otro = sugerencias.get(i);
-
-            JPanel av = crearAvatar(36, colorDeUsuario(otro));
-            av.setBounds(12, sugY, 36, 36);
-            av.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            av.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    abrirPerfilOtro(otro);
-                }
-            });
-            right.add(av);
-
-            // contar seguidores
             int seguidores = GestorUsuarios.getFollowers(otro).size();
 
             JLabel lUser = new JLabel(otro);
@@ -763,22 +774,4 @@ public class Gui_Home {
 
     private Color colorDeUsuario(String username) { return new Color(180, 180, 180); }
 
-    private JPanel crearAvatar(int size, Color color) {
-        JPanel p = new JPanel(null) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.fillOval(0, 0, size, size);
-                g2.dispose();
-            }
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(size, size);
-            }
-        };
-        p.setOpaque(false);
-        return p;
-    }
 }
