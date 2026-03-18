@@ -24,20 +24,20 @@ import javax.swing.*;
  */
 public class Gui_Perfil {
 
-    private static final Color BORDE    = new Color(219, 219, 219);
-    private static final Color FONDO    = new Color(250, 250, 250);
-    private static final Color TEXTO    = new Color(38, 38, 38);
-    private static final Color GRIS     = new Color(142, 142, 142);
-    private static final Color AZUL     = new Color(0, 149, 246);
-    private static final Color BLANCO   = Color.WHITE;
-    private static final Color HOVER    = new Color(245, 245, 245);
-    private static final Color ROJO     = new Color(237, 73, 86);
-    private static final Color VERDE    = new Color(39, 174, 96);
-    private static final Color MORADO   = new Color(88, 81, 219);
+    private static final Color BORDE = new Color(219, 219, 219);
+    private static final Color FONDO = new Color(250, 250, 250);
+    private static final Color TEXTO = new Color(38, 38, 38);
+    private static final Color GRIS = new Color(142, 142, 142);
+    private static final Color AZUL = new Color(0, 149, 246);
+    private static final Color BLANCO = Color.WHITE;
+    private static final Color HOVER = new Color(245, 245, 245);
+    private static final Color ROJO = new Color(237, 73, 86);
+    private static final Color VERDE = new Color(39, 174, 96);
+    private static final Color MORADO = new Color(88, 81, 219);
 
-    private static final int W         = 1366;
-    private static final int H         = 768;
-    private static final int TOPBAR_H  = 54;
+    private static final int W = 1366;
+    private static final int H = 768;
+    private static final int TOPBAR_H = 54;
     private static final int SIDEBAR_W = 244;
 
     private final JFrame ventana;
@@ -50,9 +50,9 @@ public class Gui_Perfil {
     private JLabel lblEstadoBtn;
 
     public Gui_Perfil(JFrame ventana, Gui_Navegador nav, String usuarioActual, String usernamePerfil) {
-        this.ventana        = ventana;
-        this.nav            = nav;
-        this.usuarioActual  = usuarioActual;
+        this.ventana = ventana;
+        this.nav = nav;
+        this.usuarioActual = usuarioActual;
         this.usernamePerfil = usernamePerfil;
     }
 
@@ -116,7 +116,7 @@ public class Gui_Perfil {
         bar.add(logo);
         return bar;
     }
-    
+
     private JPanel construirSidebar() {
         JPanel side = new JPanel(null) {
             @Override
@@ -171,10 +171,11 @@ public class Gui_Perfil {
         lblVerPerfil.setBounds(84, 44, 80, 16);
         lblVerPerfil.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) { nav.ir("perfil"); }
+            public void mouseClicked(MouseEvent e) {
+                nav.ir("perfil");
+            }
         });
         side.add(lblVerPerfil);
-
 
         JSeparator sep = new JSeparator();
         sep.setForeground(BORDE);
@@ -205,23 +206,23 @@ public class Gui_Perfil {
                     g2.setStroke(new BasicStroke(activo ? 2.2f : 1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     switch (idx) {
                         case 0:
-                            int[] hx = {cx, cx+10, cx+10, cx-10, cx-10};
-                            int[] hy = {cy-10, cy, cy+10, cy+10, cy};
+                            int[] hx = {cx, cx + 10, cx + 10, cx - 10, cx - 10};
+                            int[] hy = {cy - 10, cy, cy + 10, cy + 10, cy};
                             g2.drawPolygon(hx, hy, 5);
-                            g2.drawRect(cx-4, cy+1, 8, 9);
+                            g2.drawRect(cx - 4, cy + 1, 8, 9);
                             break;
                         case 1:
-                            g2.drawOval(cx-9, cy-10, 18, 18);
-                            g2.drawLine(cx+7, cy+6, cx+12, cy+11);
+                            g2.drawOval(cx - 9, cy - 10, 18, 18);
+                            g2.drawLine(cx + 7, cy + 6, cx + 12, cy + 11);
                             break;
                         case 2:
-                            g2.drawRoundRect(cx-11, cy-11, 22, 22, 6, 6);
-                            g2.drawLine(cx, cy-6, cx, cy+6);
-                            g2.drawLine(cx-6, cy, cx+6, cy);
+                            g2.drawRoundRect(cx - 11, cy - 11, 22, 22, 6, 6);
+                            g2.drawLine(cx, cy - 6, cx, cy + 6);
+                            g2.drawLine(cx - 6, cy, cx + 6, cy);
                             break;
                         case 3:
-                            g2.drawRoundRect(cx-11, cy-9, 22, 17, 5, 5);
-                            g2.drawLine(cx-5, cy+8, cx-8, cy+12);
+                            g2.drawRoundRect(cx - 11, cy - 9, 22, 17, 5, 5);
+                            g2.drawLine(cx - 5, cy + 8, cx - 8, cy + 12);
                             // Badge de mensajes no leidos
                             int noLeidos = contarMensajesNoLeidos();
                             if (noLeidos > 0) {
@@ -231,13 +232,13 @@ public class Gui_Perfil {
                                 g2.setColor(Color.WHITE);
                                 g2.setFont(new Font("SansSerif", Font.BOLD, 8));
                                 FontMetrics fmb = g2.getFontMetrics();
-                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge))/2, cy - 14 + 11);
+                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge)) / 2, cy - 14 + 11);
                             }
                             break;
                         case 4:
-                            g2.drawOval(cx-10, cy-10, 20, 20);
-                            g2.fillOval(cx-4, cy-6, 8, 8);
-                            g2.drawArc(cx-8, cy+1, 16, 12, 0, 180);
+                            g2.drawOval(cx - 10, cy - 10, 20, 20);
+                            g2.fillOval(cx - 4, cy - 6, 8, 8);
+                            g2.drawArc(cx - 8, cy + 1, 16, 12, 0, 180);
                             break;
                     }
                     g2.setFont(new Font("SansSerif", activo ? Font.BOLD : Font.PLAIN, 14));
@@ -253,10 +254,18 @@ public class Gui_Perfil {
             btn.setBorderPainted(false);
             btn.setFocusPainted(false);
             btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            if (idx == 0) btn.addActionListener(e -> nav.ir("home"));
-            if (idx == 1) btn.addActionListener(e -> nav.ir("buscar"));
-            if (idx == 2) btn.addActionListener(e -> nav.ir("crear"));
-            if (idx == 3) btn.addActionListener(e -> nav.ir("chats"));
+            if (idx == 0) {
+                btn.addActionListener(e -> nav.ir("home"));
+            }
+            if (idx == 1) {
+                btn.addActionListener(e -> nav.ir("buscar"));
+            }
+            if (idx == 2) {
+                btn.addActionListener(e -> nav.ir("crear"));
+            }
+            if (idx == 3) {
+                btn.addActionListener(e -> nav.ir("chats"));
+            }
             side.add(btn);
         }
 
@@ -267,6 +276,7 @@ public class Gui_Perfil {
         side.add(lblFooter);
         return side;
     }
+
     private int contarMensajesNoLeidos() {
         int total = 0;
         for (String otro : Conversacion.getConversaciones(usuarioActual)) {
@@ -274,11 +284,11 @@ public class Gui_Perfil {
         }
         return total;
     }
-    private JPanel construirAreaPerfil() {  
+
+    private JPanel construirAreaPerfil() {
         int areaX = SIDEBAR_W;
         int areaW = W - SIDEBAR_W;
-        
-        
+
         JPanel area = new JPanel(null);
         area.setBackground(FONDO);
         area.setBounds(areaX, TOPBAR_H, areaW, H - TOPBAR_H);
@@ -382,8 +392,8 @@ public class Gui_Perfil {
                         String ext = ruta.substring(ruta.lastIndexOf('.'));
                         String destino = GestorArchivos.RAIZ + usernamePerfil + "/imagenes/perfil" + ext;
                         java.nio.file.Files.copy(java.nio.file.Paths.get(ruta),
-                            java.nio.file.Paths.get(destino),
-                            java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                java.nio.file.Paths.get(destino),
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                         Usuario uAct = Usuario.cargarDesdeArchivo(usernamePerfil);
                         if (uAct != null) {
                             uAct.setRutaFoto(destino);
@@ -401,8 +411,8 @@ public class Gui_Perfil {
             btnTipo.setBounds(460, 148, 160, 34);
             btnTipo.addActionListener(e -> {
                 int conf = JOptionPane.showConfirmDialog(ventana,
-                    u.esPublico() ? "Cambiar cuenta a privada?" : "Cambiar cuenta a publica?",
-                    "Confirmar", JOptionPane.YES_NO_OPTION);
+                        u.esPublico() ? "Cambiar cuenta a privada?" : "Cambiar cuenta a publica?",
+                        "Confirmar", JOptionPane.YES_NO_OPTION);
                 if (conf == JOptionPane.YES_OPTION) {
                     u.setTipoCuenta(u.esPublico() ? "Privada" : "Publica");
                     u.guardar();
@@ -414,11 +424,14 @@ public class Gui_Perfil {
             btnEstado.setBounds(290, 148, 160, 34);
             btnEstado.addActionListener(e -> {
                 int conf = JOptionPane.showConfirmDialog(ventana,
-                    activo ? "Desactivar tu cuenta?" : "Activar tu cuenta?",
-                    "Confirmar", JOptionPane.YES_NO_OPTION);
+                        activo ? "Desactivar tu cuenta?" : "Activar tu cuenta?",
+                        "Confirmar", JOptionPane.YES_NO_OPTION);
                 if (conf == JOptionPane.YES_OPTION) {
-                    if (activo) GestorUsuarios.desactivar(usernamePerfil);
-                    else        GestorUsuarios.activar(usernamePerfil);
+                    if (activo) {
+                        GestorUsuarios.desactivar(usernamePerfil);
+                    } else {
+                        GestorUsuarios.activar(usernamePerfil);
+                    }
                     nav.ir("home");
                 }
             });
@@ -520,8 +533,7 @@ public class Gui_Perfil {
 
         return area;
     }
-    
-    
+
     private void mostrarSolicitudes(List<String> solicitudes) {
         JDialog dlg = new JDialog(ventana, "Solicitudes de seguimiento", true);
         dlg.setLayout(new BorderLayout());
@@ -575,6 +587,7 @@ public class Gui_Perfil {
         dlg.add(scroll, BorderLayout.CENTER);
         dlg.setVisible(true);
     }
+
     private JPanel crearCeldaPublicacion(Publicacion p, int w, int h) {
         Color color = colorDeUsuario(p.getAutor());
 
@@ -622,7 +635,8 @@ public class Gui_Perfil {
         if (rutaImg != null && !rutaImg.isEmpty()) {
             try {
                 imgPost[0] = javax.imageio.ImageIO.read(new File(rutaImg).getAbsoluteFile());
-            } catch (Exception ex) { }
+            } catch (Exception ex) {
+            }
         }
 
         JPanel pnlImagen = new JPanel(null) {
@@ -639,8 +653,6 @@ public class Gui_Perfil {
         };
         pnlImagen.setPreferredSize(new Dimension(280, 500));
         dlg.add(pnlImagen, BorderLayout.WEST);
-
-        // Panel derecho — comentarios
         JPanel pnlDerecho = new JPanel(new BorderLayout());
         dlg.add(pnlDerecho, BorderLayout.CENTER);
 
@@ -648,7 +660,7 @@ public class Gui_Perfil {
         pnlLista.setLayout(new BoxLayout(pnlLista, BoxLayout.Y_AXIS));
         pnlLista.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         String hashtagsTitulo = p.getHashtags() != null && !p.getHashtags().isEmpty()
-            ? " " + p.getHashtags() : "";
+                ? " " + p.getHashtags() : "";
         JPanel panelTitulo = new JPanel();
         panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
         panelTitulo.setOpaque(false);
@@ -685,8 +697,6 @@ public class Gui_Perfil {
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(10);
         pnlDerecho.add(scroll, BorderLayout.CENTER);
-
-        // Barra escribir comentario
         JPanel barraEscribir = new JPanel(new BorderLayout(6, 0));
         barraEscribir.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
         JTextField txtCom = new JTextField();
@@ -715,7 +725,6 @@ public class Gui_Perfil {
         JPanel fila = new JPanel(new BorderLayout(8, 0));
         fila.setOpaque(false);
         fila.setAlignmentX(Component.LEFT_ALIGNMENT);
-        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE - 1));
 
         Usuario uCom = username.isEmpty() ? null : Usuario.cargarDesdeArchivo(username);
         String rutaCom = uCom != null ? uCom.getRutaFoto() : null;
@@ -733,7 +742,8 @@ public class Gui_Perfil {
                             g2.dispose();
                             return;
                         }
-                    } catch (Exception ex) { }
+                    } catch (Exception ex) {
+                    }
                 }
                 g2.setColor(colorDeUsuario(username));
                 g2.fillOval(0, 0, 32, 32);
@@ -743,7 +753,7 @@ public class Gui_Perfil {
         avatar.setOpaque(false);
         avatar.setPreferredSize(new Dimension(32, 32));
         avatar.setMinimumSize(new Dimension(32, 32));
-        avatar.setMaximumSize(new Dimension(32, 32));
+        avatar.setMaximumSize(new Dimension(32, Integer.MAX_VALUE));
 
         JTextArea txtArea = new JTextArea(com);
         txtArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -754,7 +764,11 @@ public class Gui_Perfil {
         txtArea.setEditable(false);
         txtArea.setFocusable(false);
         txtArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 8));
+        txtArea.setSize(new Dimension(330, Short.MAX_VALUE));
+        int alturaReal = Math.max(36, txtArea.getPreferredSize().height);
+        txtArea.setPreferredSize(new Dimension(330, alturaReal));
 
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, alturaReal + 0));
         fila.add(avatar, BorderLayout.WEST);
         fila.add(txtArea, BorderLayout.CENTER);
         return fila;
@@ -807,8 +821,10 @@ public class Gui_Perfil {
         return btn;
     }
 
-    private Color colorDeUsuario(String username) { return new Color(180, 180, 180); }
-    
+    private Color colorDeUsuario(String username) {
+        return new Color(180, 180, 180);
+    }
+
     public void abrirPublicacion(Publicacion p) {
         mostrarDialogoPublicacion(p);
     }

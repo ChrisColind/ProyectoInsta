@@ -12,6 +12,7 @@ import java.util.List;
  *
  * @author Rogelio
  */
+
 public class ListaPublicaciones {
  
     private Nodo<Publicacion> cabeza;

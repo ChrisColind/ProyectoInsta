@@ -20,15 +20,15 @@ import Logica.*;
  */
 public class Gui_Registro {
 
-    private static final Color BORDE     = new Color(219, 219, 219);
-    private static final Color FONDO     = new Color(250, 250, 250);
-    private static final Color TEXTO     = new Color(38, 38, 38);
-    private static final Color GRIS      = new Color(142, 142, 142);
-    private static final Color AZUL      = new Color(0, 149, 246);
+    private static final Color BORDE = new Color(219, 219, 219);
+    private static final Color FONDO = new Color(250, 250, 250);
+    private static final Color TEXTO = new Color(38, 38, 38);
+    private static final Color GRIS = new Color(142, 142, 142);
+    private static final Color AZUL = new Color(0, 149, 246);
     private static final Color AZUL_GRIS = new Color(147, 204, 247);
-    private static final Color ROJO      = new Color(237, 73, 86);
-    private static final Color BLANCO    = Color.WHITE;
-    private static final Color VERDE     = new Color(39, 174, 96);
+    private static final Color ROJO = new Color(237, 73, 86);
+    private static final Color BLANCO = Color.WHITE;
+    private static final Color VERDE = new Color(39, 174, 96);
 
     private final JFrame ventana;
     private final CardLayout cardLayout;
@@ -184,7 +184,7 @@ public class Gui_Registro {
         btnElegirFoto.setBounds(campoX + 265, posY, 45, campoAlto);
         btnElegirFoto.addActionListener(e -> {
             JFileChooser selector = new JFileChooser();
-                selector.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagenes", "jpg", "jpeg", "png", "gif", "bmp", "webp"));
+            selector.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagenes", "jpg", "jpeg", "png", "gif", "bmp", "webp"));
             selector.setDialogTitle("Selecciona tu foto de perfil");
             if (selector.showOpenDialog(ventana) == JFileChooser.APPROVE_OPTION) {
                 rutaFoto = selector.getSelectedFile().getAbsolutePath();
@@ -247,9 +247,21 @@ public class Gui_Registro {
                 btnRegistrar.setBackground(lleno ? AZUL : AZUL_GRIS);
                 btnRegistrar.setEnabled(lleno);
             }
-            @Override public void insertUpdate(DocumentEvent e) { revisar(); }
-            @Override public void removeUpdate(DocumentEvent e) { revisar(); }
-            @Override public void changedUpdate(DocumentEvent e) { revisar(); }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                revisar();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                revisar();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                revisar();
+            }
         };
 
         txtNombre.getDocument().addDocumentListener(escucharCambios);
@@ -318,7 +330,9 @@ public class Gui_Registro {
         int edad;
         try {
             edad = Integer.parseInt(edadTexto);
-            if (edad < 1 || edad > 120) throw new NumberFormatException();
+            if (edad < 1 || edad > 120) {
+                throw new NumberFormatException();
+            }
         } catch (NumberFormatException ex) {
             error("Ingresa una edad valida.");
             return;
@@ -360,15 +374,15 @@ public class Gui_Registro {
             String usernameActual = username.toLowerCase();
             Gui_Navegador nav = new Gui_Navegador(cardLayout, pnlCards);
             nav.setContexto(ventana, usernameActual);
-            Gui_Home   guiHome   = new Gui_Home(ventana, nav, usernameActual);
+            Gui_Home guiHome = new Gui_Home(ventana, nav, usernameActual);
             Gui_Buscar guiBuscar = new Gui_Buscar(ventana, nav, usernameActual);
-            Gui_Chats  guiChats  = new Gui_Chats(ventana, nav, usernameActual);
-            Gui_Crear  guiCrear  = new Gui_Crear(ventana, nav, usernameActual);
+            Gui_Chats guiChats = new Gui_Chats(ventana, nav, usernameActual);
+            Gui_Crear guiCrear = new Gui_Crear(ventana, nav, usernameActual);
             Gui_Perfil guiPerfil = new Gui_Perfil(ventana, nav, usernameActual, usernameActual);
-            pnlCards.add(guiHome.construirPantalla(),   "home");
+            pnlCards.add(guiHome.construirPantalla(), "home");
             pnlCards.add(guiBuscar.construirPantalla(), "buscar");
-            pnlCards.add(guiChats.construirPantalla(),  "chats");
-            pnlCards.add(guiCrear.construirPantalla(),  "crear");
+            pnlCards.add(guiChats.construirPantalla(), "chats");
+            pnlCards.add(guiCrear.construirPantalla(), "crear");
             pnlCards.add(guiPerfil.construirPantalla(), "perfil");
             cardLayout.show(pnlCards, "home");
         });
@@ -377,7 +391,9 @@ public class Gui_Registro {
     }
 
     private String copiarFoto(String username) {
-        if (rutaFoto == null) return null;
+        if (rutaFoto == null) {
+            return null;
+        }
         try {
             String extension = rutaFoto.substring(rutaFoto.lastIndexOf('.'));
             String destino = GestorArchivos.RAIZ + username.toLowerCase() + "/imagenes/perfil" + extension;
@@ -396,9 +412,9 @@ public class Gui_Registro {
 
     private boolean camposLlenos() {
         return !txtNombre.getText().equals("Nombre completo") && !txtNombre.getText().isEmpty()
-            && !txtUsername.getText().equals("Username") && !txtUsername.getText().isEmpty()
-            && !String.valueOf(txtPassword.getPassword()).equals("Password") && txtPassword.getPassword().length > 0
-            && !txtEdad.getText().equals("Edad") && !txtEdad.getText().isEmpty();
+                && !txtUsername.getText().equals("Username") && !txtUsername.getText().isEmpty()
+                && !String.valueOf(txtPassword.getPassword()).equals("Password") && txtPassword.getPassword().length > 0
+                && !txtEdad.getText().equals("Edad") && !txtEdad.getText().isEmpty();
     }
 
     private void limpiar(JButton btnReg, JButton btnM, JButton btnF, JButton btnPub, JButton btnPriv) {
@@ -426,8 +442,8 @@ public class Gui_Registro {
         campo.setText(placeholder);
         campo.setForeground(GRIS);
         campo.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 10)));
+                BorderFactory.createLineBorder(BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)));
     }
 
     private void resetPassword(JPasswordField campo, String placeholder) {
@@ -437,8 +453,8 @@ public class Gui_Registro {
         mostrarPass[0] = false;
         btnOjo.repaint();
         campo.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 36)));
+                BorderFactory.createLineBorder(BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 36)));
     }
 
     private JTextField crearCampo(String placeholder, int x, int y, int w, int h) {
@@ -448,8 +464,8 @@ public class Gui_Registro {
         campo.setBackground(FONDO);
         campo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         campo.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 10)));
+                BorderFactory.createLineBorder(BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)));
         campo.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -458,6 +474,7 @@ public class Gui_Registro {
                     campo.setForeground(TEXTO);
                 }
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 if (campo.getText().isEmpty()) {
@@ -477,8 +494,8 @@ public class Gui_Registro {
         campo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         campo.setEchoChar((char) 0);
         campo.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 36)));
+                BorderFactory.createLineBorder(BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 36)));
         campo.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -488,6 +505,7 @@ public class Gui_Registro {
                     campo.setEchoChar('●');
                 }
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 if (campo.getPassword().length == 0) {

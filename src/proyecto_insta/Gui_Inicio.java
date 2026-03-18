@@ -20,34 +20,34 @@ import javax.swing.*;
  */
 public class Gui_Inicio {
 
-    static final Color C_BORDE      = new Color(219, 219, 219);
+    static final Color C_BORDE = new Color(219, 219, 219);
     static final Color C_FONDO_CAMP = new Color(250, 250, 250);
-    static final Color C_TEXTO      = new Color(38, 38, 38);
-    static final Color C_GRIS       = new Color(142, 142, 142);
-    static final Color C_AZUL       = new Color(0, 149, 246);
-    static final Color C_BTN_GRIS   = new Color(147, 204, 247);
-    static final Color C_ERROR      = new Color(237, 73, 86);
-    static final Color C_BLANCO     = Color.WHITE;
-    static final Color C_FONDO      = new Color(250, 250, 250);
+    static final Color C_TEXTO = new Color(38, 38, 38);
+    static final Color C_GRIS = new Color(142, 142, 142);
+    static final Color C_AZUL = new Color(0, 149, 246);
+    static final Color C_BTN_GRIS = new Color(147, 204, 247);
+    static final Color C_ERROR = new Color(237, 73, 86);
+    static final Color C_BLANCO = Color.WHITE;
+    static final Color C_FONDO = new Color(250, 250, 250);
 
-    static final int W         = 1366;
-    static final int H         = 768;
-    static final int TOPBAR_H  = 54;
+    static final int W = 1366;
+    static final int H = 768;
+    static final int TOPBAR_H = 54;
     static final int SIDEBAR_W = 244;
-    static final int RIGHT_W   = 300;
+    static final int RIGHT_W = 300;
 
-    JFrame        ventana;
-    JPanel        panelRaiz;
-    CardLayout    cardLayout;
-    JPanel        pnlCards;
-    String        usuarioActual = "";
+    JFrame ventana;
+    JPanel panelRaiz;
+    CardLayout cardLayout;
+    JPanel pnlCards;
+    String usuarioActual = "";
 
-    JLabel        lblExcepcion;
-    JTextField    txtUsuario;
+    JLabel lblExcepcion;
+    JTextField txtUsuario;
     JPasswordField txtContra;
-    JButton       btnLogin;
-    JButton       btnOjo;
-    boolean[]     passVisible = {false};
+    JButton btnLogin;
+    JButton btnOjo;
+    boolean[] passVisible = {false};
 
     public Gui_Inicio() {
         ventana = new JFrame("Instagram");
@@ -86,11 +86,14 @@ public class Gui_Inicio {
         ventana.setContentPane(panelRaiz);
         ventana.setVisible(true);
     }
+
     private String extraerHashtags(String texto) {
         StringBuilder tags = new StringBuilder();
         for (String palabra : texto.split(" ")) {
             if (palabra.startsWith("#")) {
-                if (tags.length() > 0) tags.append(" ");
+                if (tags.length() > 0) {
+                    tags.append(" ");
+                }
                 tags.append(palabra);
             }
         }
@@ -106,9 +109,9 @@ public class Gui_Inicio {
         panel.setOpaque(false);
 
         int cartaAncho = 350;
-        int cartaAlto  = 390;
-        int cartaX     = (W - cartaAncho) / 2;
-        int cartaY     = (H - cartaAlto) / 2 - 50;
+        int cartaAlto = 390;
+        int cartaX = (W - cartaAncho) / 2;
+        int cartaY = (H - cartaAlto) / 2 - 50;
 
         JPanel carta = new JPanel(null) {
             @Override
@@ -156,8 +159,8 @@ public class Gui_Inicio {
         txtUsuario.setBackground(C_FONDO_CAMP);
         txtUsuario.setFont(new Font("SansSerif", Font.PLAIN, 12));
         txtUsuario.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(C_BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 10)));
+                BorderFactory.createLineBorder(C_BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)));
         txtUsuario.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -166,6 +169,7 @@ public class Gui_Inicio {
                     txtUsuario.setForeground(C_TEXTO);
                 }
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 if (txtUsuario.getText().isEmpty()) {
@@ -183,8 +187,8 @@ public class Gui_Inicio {
         txtContra.setFont(new Font("SansSerif", Font.PLAIN, 12));
         txtContra.setEchoChar((char) 0);
         txtContra.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(C_BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 36)));
+                BorderFactory.createLineBorder(C_BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 36)));
         txtContra.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -196,6 +200,7 @@ public class Gui_Inicio {
                     btnOjo.repaint();
                 }
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 if (txtContra.getPassword().length == 0) {
@@ -263,7 +268,7 @@ public class Gui_Inicio {
                 g2.setFont(getFont());
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
-                    (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
+                        (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
         };
@@ -279,8 +284,11 @@ public class Gui_Inicio {
         btnLogin.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (camposOk()) btnLogin.setBackground(new Color(24, 119, 242));
+                if (camposOk()) {
+                    btnLogin.setBackground(new Color(24, 119, 242));
+                }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 btnLogin.setBackground(camposOk() ? C_AZUL : C_BTN_GRIS);
@@ -332,9 +340,21 @@ public class Gui_Inicio {
                 btnLogin.setBackground(ok ? C_AZUL : C_BTN_GRIS);
                 btnLogin.setEnabled(ok);
             }
-            @Override public void insertUpdate(javax.swing.event.DocumentEvent e)  { actualizar(); }
-            @Override public void removeUpdate(javax.swing.event.DocumentEvent e)  { actualizar(); }
-            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { actualizar(); }
+
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                actualizar();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                actualizar();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                actualizar();
+            }
         };
         txtUsuario.getDocument().addDocumentListener(dl);
         txtContra.getDocument().addDocumentListener(dl);
@@ -351,7 +371,7 @@ public class Gui_Inicio {
     public void accionLogin() {
         ServidorNotificaciones.getInstance().iniciar();
         String usuario = txtUsuario.getText().trim();
-        String contra  = String.valueOf(txtContra.getPassword());
+        String contra = String.valueOf(txtContra.getPassword());
 
         if (usuario.isEmpty() || usuario.equals("Usuario")
                 || contra.isEmpty() || contra.equals("Contraseña")) {
@@ -383,16 +403,16 @@ public class Gui_Inicio {
 
         Gui_Navegador nav = new Gui_Navegador(cardLayout, pnlCards);
         nav.setContexto(ventana, usuarioActual);
-        Gui_Home   guiHome   = new Gui_Home(ventana, nav, usuarioActual);
+        Gui_Home guiHome = new Gui_Home(ventana, nav, usuarioActual);
         Gui_Buscar guiBuscar = new Gui_Buscar(ventana, nav, usuarioActual);
-        Gui_Chats  guiChats  = new Gui_Chats(ventana, nav, usuarioActual);
-        Gui_Crear  guiCrear  = new Gui_Crear(ventana, nav, usuarioActual);
+        Gui_Chats guiChats = new Gui_Chats(ventana, nav, usuarioActual);
+        Gui_Crear guiCrear = new Gui_Crear(ventana, nav, usuarioActual);
         Gui_Perfil guiPerfil = new Gui_Perfil(ventana, nav, usuarioActual, usuarioActual);
 
-        pnlCards.add(guiHome.construirPantalla(),   "home");
+        pnlCards.add(guiHome.construirPantalla(), "home");
         pnlCards.add(guiBuscar.construirPantalla(), "buscar");
-        pnlCards.add(guiChats.construirPantalla(),  "chats");
-        pnlCards.add(guiCrear.construirPantalla(),  "crear");
+        pnlCards.add(guiChats.construirPantalla(), "chats");
+        pnlCards.add(guiCrear.construirPantalla(), "crear");
         pnlCards.add(guiPerfil.construirPantalla(), "perfil");
 
         ir("home");

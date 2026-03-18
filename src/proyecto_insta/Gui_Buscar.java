@@ -473,9 +473,14 @@ public class Gui_Buscar {
         return celda;
     }
     
-    private JPanel crearFila(Object item, int campW) {
-        if (item instanceof Usuario) return crearFilaUsuario((Usuario) item, campW);
-        if (item instanceof Publicacion) return crearFilaPublicacion((Publicacion) item, campW);
+    private JPanel crearFila(Object item, int campW){
+        if(item instanceof Usuario){    
+            return crearFilaUsuario((Usuario) item, campW);
+        }
+        
+        if(item instanceof Publicacion){
+            return crearFilaPublicacion((Publicacion) item, campW);
+        }
         return new JPanel();
     }
     

@@ -9,14 +9,9 @@ import Logica.*;
 import PEnums.Enums.TipoMultimedia;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import javax.swing.*;
-import javax.swing.border.*;
 
 /**
  *
@@ -24,40 +19,42 @@ import javax.swing.border.*;
  */
 public class Gui_Crear {
 
-    private static final Color C_BORDE      = new Color(219, 219, 219);
-    private static final Color C_FONDO      = new Color(250, 250, 250);
-    private static final Color C_TEXTO      = new Color(38,  38,  38);
-    private static final Color C_GRIS       = new Color(142, 142, 142);
-    private static final Color C_AZUL       = new Color(0,   149, 246);
-    private static final Color C_BLANCO     = Color.WHITE;
-    private static final Color C_HOVER      = new Color(245, 245, 245);
+    private static final Color C_BORDE = new Color(219, 219, 219);
+    private static final Color C_FONDO = new Color(250, 250, 250);
+    private static final Color C_TEXTO = new Color(38, 38, 38);
+    private static final Color C_GRIS = new Color(142, 142, 142);
+    private static final Color C_AZUL = new Color(0, 149, 246);
+    private static final Color C_BLANCO = Color.WHITE;
+    private static final Color C_HOVER = new Color(245, 245, 245);
     private static final Color C_FONDO_CAMP = new Color(239, 239, 239);
 
-    private static final int W         = 1366;
-    private static final int H         = 768;
-    private static final int TOPBAR_H  = 54;
+    private static final int W = 1366;
+    private static final int H = 768;
+    private static final int TOPBAR_H = 54;
     private static final int SIDEBAR_W = 244;
 
-    private final JFrame ventana;
-    private final Gui_Navegador nav;
-    private final String usuarioActual;
-
-    private String   propSeleccionada = "Cuadrada";
-    private String   rutaImagen       = null;
-    private JLabel   lblVistaImagen;
-    private JLabel   lblNombreArchivo;
-    private JTextArea txtContenido;
+    
     private JTextField txtHashtags;
+    private final JFrame ventana;
+    private final String usuarioActual;
+    private JTextArea txtContenido;
+
+    private String propSeleccionada = "Cuadrada";
+    private String rutaImagen = null;
+    private JLabel lblVistaImagen;
+    private JButton btnHorizontal;
+    
+    private final Gui_Navegador nav;
+    private JLabel lblNombreArchivo;
     private JTextField txtMenciones;
-    private JLabel   lblContador;
+    private JLabel lblContador;
 
     private JButton btnCuadrada;
     private JButton btnVertical;
-    private JButton btnHorizontal;
 
     public Gui_Crear(JFrame ventana, Gui_Navegador nav, String usuarioActual) {
-        this.ventana       = ventana;
-        this.nav           = nav;
+        this.ventana = ventana;
+        this.nav = nav;
         this.usuarioActual = usuarioActual;
     }
 
@@ -73,7 +70,8 @@ public class Gui_Crear {
 
     private JPanel construirTopBar() {
         JPanel bar = new JPanel(null) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.setColor(C_BORDE);
                 g.drawLine(0, TOPBAR_H - 1, W, TOPBAR_H - 1);
@@ -83,9 +81,10 @@ public class Gui_Crear {
         bar.setBounds(0, 0, W, TOPBAR_H);
 
         JLabel lblLogo = new JLabel("Instagram") {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
                 GradientPaint gp = new GradientPaint(0, 0, new Color(88, 81, 219), getWidth(), 0, new Color(247, 119, 55));
                 g2.setPaint(gp);
@@ -103,7 +102,8 @@ public class Gui_Crear {
 
     private JPanel construirSidebar() {
         JPanel side = new JPanel(null) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.setColor(C_BORDE);
                 g.drawLine(SIDEBAR_W - 1, 0, SIDEBAR_W - 1, H);
@@ -154,44 +154,58 @@ public class Gui_Crear {
         lblVerPerfil.setBounds(84, 44, 80, 16);
         lblVerPerfil.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) { nav.ir("perfil"); }
+            public void mouseClicked(MouseEvent e) {
+                nav.ir("perfil");
+            }
         });
         side.add(lblVerPerfil);
-
 
         JSeparator sep = new JSeparator();
         sep.setForeground(C_BORDE);
         sep.setBounds(16, 90, SIDEBAR_W - 32, 1);
         side.add(sep);
 
-        String[] opNombres = { "Inicio", "Buscar", "Crear", "Chats", "Perfil" };
-        int[]    opY       = { 110, 162, 214, 266, 318 };
+        String[] opNombres = {"Inicio", "Buscar", "Crear", "Chats", "Perfil"};
+        int[] opY = {110, 162, 214, 266, 318};
 
         for (int i = 0; i < opNombres.length; i++) {
-            final int     idx    = i;
+            final int idx = i;
             final boolean activo = (idx == 2);
 
             JButton btnNav = new JButton() {
-                @Override protected void paintComponent(Graphics g) {
+                @Override
+                protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    if (activo)                       { g2.setColor(new Color(240,240,255)); g2.fillRoundRect(0,0,getWidth(),getHeight(),8,8); }
-                    else if (getModel().isRollover()) { g2.setColor(C_HOVER);               g2.fillRoundRect(0,0,getWidth(),getHeight(),8,8); }
+                    if (activo) {
+                        g2.setColor(new Color(240, 240, 255));
+                        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    } else if (getModel().isRollover()) {
+                        g2.setColor(C_HOVER);
+                        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    }
                     int cx = 28, cy = getHeight() / 2;
-                    g2.setColor(activo ? new Color(88,81,219) : C_TEXTO);
+                    g2.setColor(activo ? new Color(88, 81, 219) : C_TEXTO);
                     g2.setStroke(new BasicStroke(activo ? 2.2f : 1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     switch (idx) {
                         case 0:
-                            int[] hx={cx,cx+10,cx+10,cx-10,cx-10}, hy={cy-10,cy,cy+10,cy+10,cy};
-                            g2.drawPolygon(hx,hy,5); g2.drawRect(cx-4,cy+1,8,9); break;
+                            int[] hx = {cx, cx + 10, cx + 10, cx - 10, cx - 10},
+                             hy = {cy - 10, cy, cy + 10, cy + 10, cy};
+                            g2.drawPolygon(hx, hy, 5);
+                            g2.drawRect(cx - 4, cy + 1, 8, 9);
+                            break;
                         case 1:
-                            g2.drawOval(cx-9,cy-10,18,18); g2.drawLine(cx+7,cy+6,cx+12,cy+11); break;
+                            g2.drawOval(cx - 9, cy - 10, 18, 18);
+                            g2.drawLine(cx + 7, cy + 6, cx + 12, cy + 11);
+                            break;
                         case 2:
-                            g2.drawRoundRect(cx-11,cy-11,22,22,6,6);
-                            g2.drawLine(cx,cy-6,cx,cy+6); g2.drawLine(cx-6,cy,cx+6,cy); break;
+                            g2.drawRoundRect(cx - 11, cy - 11, 22, 22, 6, 6);
+                            g2.drawLine(cx, cy - 6, cx, cy + 6);
+                            g2.drawLine(cx - 6, cy, cx + 6, cy);
+                            break;
                         case 3:
-                            g2.drawRoundRect(cx-11, cy-9, 22, 17, 5, 5);
-                            g2.drawLine(cx-5, cy+8, cx-8, cy+12);
+                            g2.drawRoundRect(cx - 11, cy - 9, 22, 17, 5, 5);
+                            g2.drawLine(cx - 5, cy + 8, cx - 8, cy + 12);
                             // Badge de mensajes no leidos
                             int noLeidos = contarMensajesNoLeidos();
                             if (noLeidos > 0) {
@@ -201,28 +215,40 @@ public class Gui_Crear {
                                 g2.setColor(Color.WHITE);
                                 g2.setFont(new Font("SansSerif", Font.BOLD, 8));
                                 FontMetrics fmb = g2.getFontMetrics();
-                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge))/2, cy - 14 + 11);
+                                g2.drawString(badge, cx + 4 + (16 - fmb.stringWidth(badge)) / 2, cy - 14 + 11);
                             }
                             break;
                         case 4:
-                            g2.drawOval(cx-10,cy-10,20,20); g2.fillOval(cx-4,cy-6,8,8);
-                            g2.drawArc(cx-8,cy+1,16,12,0,180); break;
+                            g2.drawOval(cx - 10, cy - 10, 20, 20);
+                            g2.fillOval(cx - 4, cy - 6, 8, 8);
+                            g2.drawArc(cx - 8, cy + 1, 16, 12, 0, 180);
+                            break;
                     }
                     g2.setFont(new Font("SansSerif", activo ? Font.BOLD : Font.PLAIN, 14));
-                    g2.setColor(activo ? new Color(88,81,219) : C_TEXTO);
+                    g2.setColor(activo ? new Color(88, 81, 219) : C_TEXTO);
                     FontMetrics fm = g2.getFontMetrics();
-                    g2.drawString(opNombres[idx], 52, cy + fm.getAscent()/2 - 1);
+                    g2.drawString(opNombres[idx], 52, cy + fm.getAscent() / 2 - 1);
                     g2.dispose();
                 }
             };
             btnNav.setBounds(8, opY[i], SIDEBAR_W - 16, 44);
-            btnNav.setOpaque(false); btnNav.setContentAreaFilled(false);
-            btnNav.setBorderPainted(false); btnNav.setFocusPainted(false);
+            btnNav.setOpaque(false);
+            btnNav.setContentAreaFilled(false);
+            btnNav.setBorderPainted(false);
+            btnNav.setFocusPainted(false);
             btnNav.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            if (idx == 0) btnNav.addActionListener(e -> nav.ir("home"));
-            if (idx == 1) btnNav.addActionListener(e -> nav.ir("buscar"));
-            if (idx == 3) btnNav.addActionListener(e -> nav.ir("chats"));
-            if (idx == 4) btnNav.addActionListener(e -> nav.ir("perfil"));
+            if (idx == 0) {
+                btnNav.addActionListener(e -> nav.ir("home"));
+            }
+            if (idx == 1) {
+                btnNav.addActionListener(e -> nav.ir("buscar"));
+            }
+            if (idx == 3) {
+                btnNav.addActionListener(e -> nav.ir("chats"));
+            }
+            if (idx == 4) {
+                btnNav.addActionListener(e -> nav.ir("perfil"));
+            }
             side.add(btnNav);
         }
 
@@ -234,6 +260,7 @@ public class Gui_Crear {
 
         return side;
     }
+
     private int contarMensajesNoLeidos() {
         int total = 0;
         for (String otro : Conversacion.getConversaciones(usuarioActual)) {
@@ -274,24 +301,25 @@ public class Gui_Crear {
         y += 26;
 
         lblVistaImagen = new JLabel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(C_FONDO_CAMP);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
                 g2.setColor(C_BORDE);
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 12, 12);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
                 if (getIcon() == null) {
-                    int cx = getWidth()/2, cy = getHeight()/2;
+                    int cx = getWidth() / 2, cy = getHeight() / 2;
                     g2.setColor(C_GRIS);
                     g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawRoundRect(cx-24, cy-18, 48, 34, 8, 8);
-                    g2.drawOval(cx-10, cy-10, 20, 20);
-                    g2.fillRoundRect(cx-5, cy-22, 10, 6, 3, 3);
+                    g2.drawRoundRect(cx - 24, cy - 18, 48, 34, 8, 8);
+                    g2.drawOval(cx - 10, cy - 10, 20, 20);
+                    g2.fillRoundRect(cx - 5, cy - 22, 10, 6, 3, 3);
                     g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
                     FontMetrics fm = g2.getFontMetrics();
                     String txt = "Sin imagen seleccionada";
-                    g2.drawString(txt, cx - fm.stringWidth(txt)/2, cy + 30);
+                    g2.drawString(txt, cx - fm.stringWidth(txt) / 2, cy + 30);
                 }
                 g2.dispose();
                 super.paintComponent(g);
@@ -317,13 +345,14 @@ public class Gui_Crear {
             if (fc.showOpenDialog(ventana) == JFileChooser.APPROVE_OPTION) {
                 rutaImagen = fc.getSelectedFile().getAbsolutePath();
                 String nombre = fc.getSelectedFile().getName();
-                lblNombreArchivo.setText(nombre.length() > 28 ? nombre.substring(0,28)+"..." : nombre);
+                lblNombreArchivo.setText(nombre.length() > 28 ? nombre.substring(0, 28) + "..." : nombre);
                 lblNombreArchivo.setForeground(C_TEXTO);
                 try {
                     ImageIcon icon = new ImageIcon(rutaImagen);
                     Image scaled = icon.getImage().getScaledInstance(360, 220, Image.SCALE_SMOOTH);
                     lblVistaImagen.setIcon(new ImageIcon(scaled));
-                } catch (Exception ex) { }
+                } catch (Exception ex) {
+                }
                 lblVistaImagen.repaint();
             }
         });
@@ -337,18 +366,18 @@ public class Gui_Crear {
         area.add(lblProp);
         y += 24;
 
-        btnCuadrada   = crearBtnProp("Cuadrada\n600x600");
-        btnVertical   = crearBtnProp("Vertical\n600x750");
+        btnCuadrada = crearBtnProp("Cuadrada\n600x600");
+        btnVertical = crearBtnProp("Vertical\n600x750");
         btnHorizontal = crearBtnProp("Horizontal\n600x400");
 
-        btnCuadrada.setBounds(col1X,       y, 110, 44);
+        btnCuadrada.setBounds(col1X, y, 110, 44);
         btnVertical.setBounds(col1X + 120, y, 110, 44);
         btnHorizontal.setBounds(col1X + 240, y, 120, 44);
 
         seleccionarProp("Cuadrada");
 
-        btnCuadrada.addActionListener(e   -> seleccionarProp("Cuadrada"));
-        btnVertical.addActionListener(e   -> seleccionarProp("Vertical"));
+        btnCuadrada.addActionListener(e -> seleccionarProp("Cuadrada"));
+        btnVertical.addActionListener(e -> seleccionarProp("Vertical"));
         btnHorizontal.addActionListener(e -> seleccionarProp("Horizontal"));
 
         area.add(btnCuadrada);
@@ -370,8 +399,8 @@ public class Gui_Crear {
         txtContenido.setLineWrap(true);
         txtContenido.setWrapStyleWord(true);
         txtContenido.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(C_BORDE, 1),
-            BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+                BorderFactory.createLineBorder(C_BORDE, 1),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
         txtContenido.setBackground(C_BLANCO);
 
         JScrollPane scrollContenido = new JScrollPane(txtContenido);
@@ -398,7 +427,8 @@ public class Gui_Crear {
                             try {
                                 txtContenido.setText(recortado);
                                 txtContenido.setCaretPosition(220);
-                            } catch (Exception ex) { }
+                            } catch (Exception ex) {
+                            }
                         });
                         len = 220;
                     }
@@ -407,11 +437,24 @@ public class Gui_Crear {
                         lblContador.setText(largo + " / 220");
                         lblContador.setForeground(largo >= 200 ? new Color(237, 73, 86) : C_GRIS);
                     });
-                } catch (Exception ex) { }
+                } catch (Exception ex) {
+                }
             }
-            @Override public void insertUpdate(javax.swing.event.DocumentEvent e)  { act(); }
-            @Override public void removeUpdate(javax.swing.event.DocumentEvent e)  { act(); }
-            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { act(); }
+
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                act();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                act();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                act();
+            }
         });
         y2 += 22;
 
@@ -472,11 +515,15 @@ public class Gui_Crear {
             return;
         }
 
-        String hashtags  = txtHashtags.getText().trim();
+        String hashtags = txtHashtags.getText().trim();
         String menciones = txtMenciones.getText().trim();
 
-        if (hashtags.equals("#foto #nature #travel"))  hashtags  = "";
-        if (menciones.equals("@usuario1 @usuario2"))   menciones = "";
+        if (hashtags.equals("#foto #nature #travel")) {
+            hashtags = "";
+        }
+        if (menciones.equals("@usuario1 @usuario2")) {
+            menciones = "";
+        }
 
         TipoMultimedia tipoMultimedia = rutaImagen != null ? TipoMultimedia.IMAGEN : TipoMultimedia.NINGUNO;
 
@@ -507,14 +554,16 @@ public class Gui_Crear {
     private void seleccionarProp(String prop) {
         propSeleccionada = prop;
         Color fondoActivo = new Color(88, 81, 219);
-        Color fondoInact  = C_FONDO_CAMP;
-        btnCuadrada.setBackground(prop.equals("Cuadrada")    ? fondoActivo : fondoInact);
-        btnCuadrada.setForeground(prop.equals("Cuadrada")    ? C_BLANCO    : C_TEXTO);
-        btnVertical.setBackground(prop.equals("Vertical")    ? fondoActivo : fondoInact);
-        btnVertical.setForeground(prop.equals("Vertical")    ? C_BLANCO    : C_TEXTO);
+        Color fondoInact = C_FONDO_CAMP;
+        btnCuadrada.setBackground(prop.equals("Cuadrada") ? fondoActivo : fondoInact);
+        btnCuadrada.setForeground(prop.equals("Cuadrada") ? C_BLANCO : C_TEXTO);
+        btnVertical.setBackground(prop.equals("Vertical") ? fondoActivo : fondoInact);
+        btnVertical.setForeground(prop.equals("Vertical") ? C_BLANCO : C_TEXTO);
         btnHorizontal.setBackground(prop.equals("Horizontal") ? fondoActivo : fondoInact);
-        btnHorizontal.setForeground(prop.equals("Horizontal") ? C_BLANCO    : C_TEXTO);
-        btnCuadrada.repaint(); btnVertical.repaint(); btnHorizontal.repaint();
+        btnHorizontal.setForeground(prop.equals("Horizontal") ? C_BLANCO : C_TEXTO);
+        btnCuadrada.repaint();
+        btnVertical.repaint();
+        btnHorizontal.repaint();
     }
 
     private JTextField crearCampo(String placeholder, int x, int y, int w, int h) {
@@ -524,14 +573,23 @@ public class Gui_Crear {
         tf.setBackground(C_BLANCO);
         tf.setFont(new Font("SansSerif", Font.PLAIN, 12));
         tf.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(C_BORDE, 1),
-            BorderFactory.createEmptyBorder(0, 10, 0, 10)));
+                BorderFactory.createLineBorder(C_BORDE, 1),
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)));
         tf.addFocusListener(new FocusAdapter() {
-            @Override public void focusGained(FocusEvent e) {
-                if (tf.getText().equals(placeholder)) { tf.setText(""); tf.setForeground(C_TEXTO); }
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (tf.getText().equals(placeholder)) {
+                    tf.setText("");
+                    tf.setForeground(C_TEXTO);
+                }
             }
-            @Override public void focusLost(FocusEvent e) {
-                if (tf.getText().isEmpty()) { tf.setText(placeholder); tf.setForeground(C_GRIS); }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (tf.getText().isEmpty()) {
+                    tf.setText(placeholder);
+                    tf.setForeground(C_GRIS);
+                }
             }
         });
         return tf;
@@ -540,34 +598,37 @@ public class Gui_Crear {
     private JButton crearBtnProp(String texto) {
         String[] partes = texto.split("\n");
         JButton btn = new JButton() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                 g2.setColor(C_BORDE);
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 8, 8);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
                 g2.setColor(getForeground());
                 g2.setFont(new Font("SansSerif", Font.BOLD, 11));
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(partes[0], (getWidth()-fm.stringWidth(partes[0]))/2, getHeight()/2 - 2);
+                g2.drawString(partes[0], (getWidth() - fm.stringWidth(partes[0])) / 2, getHeight() / 2 - 2);
                 g2.setFont(new Font("SansSerif", Font.PLAIN, 10));
                 fm = g2.getFontMetrics();
-                g2.drawString(partes[1], (getWidth()-fm.stringWidth(partes[1]))/2, getHeight()/2 + 12);
+                g2.drawString(partes[1], (getWidth() - fm.stringWidth(partes[1])) / 2, getHeight() / 2 + 12);
                 g2.dispose();
             }
         };
         btn.setBackground(C_FONDO_CAMP);
         btn.setForeground(C_TEXTO);
         btn.setBorder(BorderFactory.createEmptyBorder());
-        btn.setFocusPainted(false); btn.setContentAreaFilled(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
     private JButton crearBotonPrincipal(String texto) {
         JButton btn = new JButton(texto) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new Color(88, 81, 219));
@@ -575,52 +636,42 @@ public class Gui_Crear {
                 g2.setColor(C_BLANCO);
                 g2.setFont(new Font("SansSerif", Font.BOLD, 14));
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), (getWidth()-fm.stringWidth(getText()))/2, (getHeight()+fm.getAscent()-fm.getDescent())/2);
+                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2, (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
         };
         btn.setBorder(BorderFactory.createEmptyBorder());
-        btn.setFocusPainted(false); btn.setContentAreaFilled(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
     private JButton crearBotonSecundario(String texto) {
         JButton btn = new JButton(texto) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(C_FONDO_CAMP);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                 g2.setColor(C_BORDE);
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 8, 8);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
                 g2.setColor(C_TEXTO);
                 g2.setFont(new Font("SansSerif", Font.PLAIN, 13));
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), (getWidth()-fm.stringWidth(getText()))/2, (getHeight()+fm.getAscent()-fm.getDescent())/2);
+                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2, (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
         };
         btn.setBorder(BorderFactory.createEmptyBorder());
-        btn.setFocusPainted(false); btn.setContentAreaFilled(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
-    private Color colorDeUsuario(String username) { return new Color(180, 180, 180); }
-
-    private JPanel crearAvatar(int size, Color color) {
-        JPanel p = new JPanel(null) {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.fillOval(0, 0, size, size);
-                g2.dispose();
-            }
-            @Override public Dimension getPreferredSize() { return new Dimension(size, size); }
-        };
-        p.setOpaque(false);
-        return p;
+    private Color colorDeUsuario(String username) {
+        return new Color(180, 180, 180);
     }
 }
